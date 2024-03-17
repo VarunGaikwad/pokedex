@@ -1,6 +1,7 @@
 import axios from "axios";
-import { PokemonListType, base_url, image_base_url } from "../data/common";
+import { PokemonListType, base_url } from "../data/common";
 import { ChangeEvent, useEffect, useState } from "react";
+import PokemonCard from "../components/PokemonCard";
 
 export default function NationalDex() {
   const [originalPokemonList, setOriginalPokemonList] = useState<
@@ -62,23 +63,13 @@ export default function NationalDex() {
         <div className="mx-2 text-2xl text-slate-700">PokéDex</div>
       </div>
       <div className="max-w-screen-xl flex flex-row flex-wrap justify-center">
-        {filteredPokemonList.map(
-          ({ entry_number, pokemon_species: { name } }) => (
-            <div
-              key={entry_number}
-              className="m-4 p-5 border-2 border-indigo-100 max-w-sm rounded overflow-hidden shadow-lg"
-            >
-              <div className="text-3xl text-slate-800">{entry_number}</div>
-              <div className="text-lg capitalize">{name}</div>
-              <img
-                width={250}
-                loading="lazy"
-                alt={name}
-                src={`${image_base_url}/other/official-artwork/${entry_number}.png`}
-              />
-            </div>
-          )
-        )}
+        {filteredPokemonList.map(({ entry_number, pokemon_species }) => (
+          <PokemonCard
+            key={entry_number}
+            entry_number={entry_number}
+            pokemon_species={pokemon_species}
+          />
+        ))}
       </div>
     </div>
   );
