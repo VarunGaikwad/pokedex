@@ -1,3 +1,9 @@
+import NationalDex from "./components/NationalDex";
+
 export default function App() {
-  return <div>App</div>;
+  return (
+    <div>
+      <NationalDex />
+    </div>
+  );
 }
