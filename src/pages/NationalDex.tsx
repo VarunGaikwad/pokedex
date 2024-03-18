@@ -10,7 +10,9 @@ export default function NationalDex() {
     [filteredPokemonList, setFilteredPokemonList] = useState<PokemonListType[]>(
       []
     ),
-    [searchTerm, setSearchTerm] = useState<string>("");
+    [searchTerm, setSearchTerm] = useState<string>(
+      localStorage.getItem("searchText") || ""
+    );
 
   useEffect(() => {
     const fetchPokemon = async () => {
@@ -29,6 +31,7 @@ export default function NationalDex() {
         name.includes(searchTerm.toLocaleLowerCase())
       )
     );
+    localStorage.setItem("searchText", searchTerm);
   }, [searchTerm, originalPokemonList]);
 
   return (
@@ -37,7 +40,7 @@ export default function NationalDex() {
         <div className="relative">
           <input
             type="text"
-            placeholder="Search Pokemon"
+            placeholder="Search Pokémon"
             value={searchTerm}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setSearchTerm(e.target.value)

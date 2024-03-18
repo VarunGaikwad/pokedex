@@ -8,7 +8,7 @@ export default function PokemonCard({
   return (
     <Link
       to={{
-        pathname: `/pokedex/${name}`,
+        pathname: `/pokedex/${entry_number}`,
       }}
     >
       <div

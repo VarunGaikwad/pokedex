@@ -9,5 +9,6 @@ export interface PokemonListType {
         url: string;
     };
 }
+
 export { base_url, image_base_url };
 
