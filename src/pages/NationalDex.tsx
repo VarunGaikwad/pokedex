@@ -1,7 +1,7 @@
-import axios from "axios";
-import { PokemonListType, base_url } from "../data/common";
+import { PokemonListType } from "../data/common";
 import { ChangeEvent, useEffect, useState } from "react";
 import PokemonCard from "../components/PokemonCard";
+import { axiosRequest } from "../service/api";
 
 export default function NationalDex() {
   const [originalPokemonList, setOriginalPokemonList] = useState<
@@ -16,9 +16,7 @@ export default function NationalDex() {
 
   useEffect(() => {
     const fetchPokemon = async () => {
-      const {
-        data: { pokemon_entries },
-      } = await axios.get(`${base_url}/api/v2/pokedex/1/`);
+      const { pokemon_entries } = await axiosRequest("/api/v2/pokedex/1/");
       setOriginalPokemonList([...pokemon_entries]);
       setFilteredPokemonList([...pokemon_entries]);
     };
