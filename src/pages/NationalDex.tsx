@@ -33,8 +33,8 @@ export default function NationalDex() {
   }, [searchTerm, originalPokemonList]);
 
   return (
-    <div className="flex flex-col justify-center">
-      <div className="sticky top-0 bg-white z-10 w-full py-2 flex justify-between items-center p-4">
+    <div className="background flex flex-col min-h-screen">
+      <div className="w-full py-2 flex justify-between items-center p-4">
         <div className="relative">
           <input
             type="text"
@@ -48,7 +48,7 @@ export default function NationalDex() {
           />
           {searchTerm && (
             <button
-              className="absolute inset-y-0 right-0 flex items-center justify-center px-3 text-gray-500 hover:text-gray-700 focus:outline-none"
+              className="absolute inset-y-0 right-0 flex items-center justify-center px-3 focus:outline-none"
               onClick={() => setSearchTerm("")}
             >
               <svg
@@ -61,7 +61,7 @@ export default function NationalDex() {
             </button>
           )}
         </div>
-        <div className="mx-2 text-2xl text-slate-700">PokéDex</div>
+        <div className="mx-2 text-2xl">PokéDex</div>
       </div>
       <div className="max-w-screen-xl flex flex-row flex-wrap justify-center">
         {filteredPokemonList.map(({ entry_number, pokemon_species }) => (

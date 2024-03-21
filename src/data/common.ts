@@ -10,5 +10,13 @@ export interface PokemonListType {
     };
 }
 
+export function pokemonNumberPadding(num: string) {
+    while (num.length < 4) {
+        num = "0" + num;
+    }
+
+    return "#" + num;
+}
+
 export { base_url, image_base_url };
 

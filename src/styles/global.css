@@ -8,6 +8,7 @@
 *::before,
 *::after {
     box-sizing: border-box;
+    color-scheme: dark light;
 }
 
 * {
@@ -51,4 +52,8 @@ h6 {
 #root,
 #__next {
     isolation: isolate;
+}
+
+.background {
+    background-image: url("../assets/background.svg");
 }
