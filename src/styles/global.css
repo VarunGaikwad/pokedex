@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Madimi+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anek+Devanagari:wght@100..800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -13,7 +13,7 @@
 
 * {
     margin: 0;
-    font-family: "Madimi One", sans-serif;
+    /* font-family: "Anek Devanagari", sans-serif; */
 }
 
 
@@ -21,7 +21,6 @@ body {
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
 }
-
 
 img,
 picture,
@@ -56,4 +55,23 @@ h6 {
 
 .background {
     background-image: url("../assets/background.svg");
+}
+
+.pokemon-card {
+    position: relative;
+    width: 328px;
+    height: 501px;
+}
+
+.pokemon-card::after {
+    content: "";
+    width: 328px;
+    height: 501px;
+    display: block;
+    position: relative;
+    background-image: url("../assets/list_pokemon_bg.avif");
+}
+
+.glow {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
 }

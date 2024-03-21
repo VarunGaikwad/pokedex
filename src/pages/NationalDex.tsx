@@ -1,36 +1,24 @@
 import { PokemonListType } from "../data/common";
 import { ChangeEvent, useEffect, useState } from "react";
 import PokemonCard from "../components/PokemonCard";
-import { axiosRequest } from "../service/api";
+import originalPokemonList from "../data/pokemon_list.json";
+import FloatButton from "../components/FloatButton";
 
 export default function NationalDex() {
-  const [originalPokemonList, setOriginalPokemonList] = useState<
-      PokemonListType[]
-    >([]),
-    [filteredPokemonList, setFilteredPokemonList] = useState<PokemonListType[]>(
-      []
-    ),
+  const [filteredPokemonList, setFilteredPokemonList] =
+      useState<PokemonListType[]>(originalPokemonList),
     [searchTerm, setSearchTerm] = useState<string>(
       localStorage.getItem("searchText") || ""
     );
 
   useEffect(() => {
-    const fetchPokemon = async () => {
-      const { pokemon_entries } = await axiosRequest("/api/v2/pokedex/1/");
-      setOriginalPokemonList([...pokemon_entries]);
-      setFilteredPokemonList([...pokemon_entries]);
-    };
-    fetchPokemon();
-  }, []);
-
-  useEffect(() => {
-    setFilteredPokemonList(
-      originalPokemonList.filter(({ pokemon_species: { name } }) =>
+    setFilteredPokemonList([
+      ...originalPokemonList.filter(({ pokemon_species: { name } }) =>
         name.includes(searchTerm.toLocaleLowerCase())
-      )
-    );
+      ),
+    ]);
     localStorage.setItem("searchText", searchTerm);
-  }, [searchTerm, originalPokemonList]);
+  }, [searchTerm]);
 
   return (
     <div className="background flex flex-col min-h-screen">
@@ -61,17 +49,19 @@ export default function NationalDex() {
             </button>
           )}
         </div>
-        <div className="mx-2 text-2xl">PokéDex</div>
+        <div className="mx-2 text-2xl">Pokédex</div>
       </div>
       <div className="max-w-screen-xl flex flex-row flex-wrap justify-center">
-        {filteredPokemonList.map(({ entry_number, pokemon_species }) => (
+        {filteredPokemonList.map(({ entry_number, pokemon_species, types }) => (
           <PokemonCard
             key={entry_number}
             entry_number={entry_number}
             pokemon_species={pokemon_species}
+            types={types}
           />
         ))}
       </div>
+      <FloatButton />
     </div>
   );
 }

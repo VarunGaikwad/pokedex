@@ -4,10 +4,18 @@ const image_base_url = "https://raw.githubusercontent.com/PokeAPI/sprites/master
 
 export interface PokemonListType {
     entry_number: number;
-    pokemon_species: {
-        name: string;
-        url: string;
-    };
+    pokemon_species: PokemonCommonType;
+    types: PokemonTypeType[]
+}
+
+interface PokemonTypeType {
+    slot: number;
+    type: PokemonCommonType
+}
+
+interface PokemonCommonType {
+    name: string;
+    url: string;
 }
 
 export function pokemonNumberPadding(num: string) {
@@ -15,7 +23,7 @@ export function pokemonNumberPadding(num: string) {
         num = "0" + num;
     }
 
-    return "#" + num;
+    return num;
 }
 
 export { base_url, image_base_url };
