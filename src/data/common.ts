@@ -28,3 +28,65 @@ export function pokemonNumberPadding(num: string) {
 
 export { base_url, image_base_url };
 
+
+export interface PokemonDetailsType {
+    base_happiness: number;
+    capture_rate: number;
+    color: PokemonCommonType
+    egg_groups: PokemonCommonType[]
+    evolution_chain: Omit<PokemonCommonType, "name">
+    evolves_from_species: PokemonCommonType
+    flavor_text_entries: PokemonFlavourType[]
+    form_descriptions: PokemonCommonType[]
+    forms_switchable: boolean
+    gender_rate: number;
+    genera: PokemonGeneraType[]
+    generation: PokemonCommonType
+    growth_rate: PokemonCommonType
+    habitat: PokemonCommonType
+    has_gender_differences: boolean
+    hatch_counter: number;
+    id: number;
+    is_baby: boolean
+    is_legendary: boolean
+    is_mythical: boolean
+    name: string
+    names: PokemonNamesType[]
+    order: number;
+    pal_park_encounters: PokemonPalParkType[]
+    pokedex_numbers: PokemonDexNumberType[]
+    shape: PokemonCommonType
+    varieties: PokemonVarietyType
+}
+
+
+interface PokemonFlavourType {
+    flavor_text: string;
+    language: PokemonCommonType
+}
+
+interface PokemonGeneraType {
+    genus: string;
+    language: PokemonCommonType
+}
+
+interface PokemonNamesType {
+    name: string;
+    language: PokemonCommonType
+}
+
+interface PokemonPalParkType {
+    base_score: number;
+    rate: number;
+    area: PokemonCommonType
+}
+
+interface PokemonDexNumberType {
+    entry_number: number;
+    pokedex: PokemonCommonType
+}
+
+interface PokemonVarietyType {
+    is_default: boolean;
+    pokemon: PokemonCommonType
+}
