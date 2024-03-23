@@ -1,19 +1,26 @@
-@import url('https://fonts.googleapis.com/css2?family=Anek+Devanagari:wght@100..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --bg-primary: #DC0A2D;
+    --bg-shadow: #627254
+}
+
 *,
 *::before,
 *::after {
     box-sizing: border-box;
-    color-scheme: dark light;
 }
 
 * {
     margin: 0;
-    /* font-family: "Anek Devanagari", sans-serif; */
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    outline: none;
 }
 
 
@@ -53,25 +60,28 @@ h6 {
     isolation: isolate;
 }
 
-.background {
-    background-image: url("../assets/background.svg");
+.bg-primary {
+    background: var(--bg-primary);
 }
 
-.pokemon-card {
-    position: relative;
-    width: 328px;
-    height: 501px;
+.search-shadow {
+    box-shadow: inset 0 0 .25rem var(--bg-primary);
+    border: none !important;
+    border-color: none !important;
+    transition: box-shadow 1.3s !important;
 }
 
-.pokemon-card::after {
-    content: "";
-    width: 328px;
-    height: 501px;
-    display: block;
-    position: relative;
-    background-image: url("../assets/list_pokemon_bg.avif");
+.search-shadow:focus {
+    box-shadow: 0 0 .25rem #999 !important;
 }
 
-.glow {
-    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+.menu-btn {
+    border-radius: 12.5rem !important;
+    background-color: white !important;
+    box-shadow: inset 0 0 .25rem var(--bg-primary) !important;
+    transition: box-shadow .3s !important;
+}
+
+.menu-btn:focus {
+    box-shadow: 0 0 .25rem #999 !important;
 }
