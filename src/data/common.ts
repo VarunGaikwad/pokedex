@@ -99,3 +99,7 @@ export interface SortMenuProps {
   sort: SortCriteria;
   setSort: React.Dispatch<React.SetStateAction<SortCriteria>>;
 }
+
+export interface SearchInputProps {
+  setSearchInput: React.Dispatch<React.SetStateAction<string>>;
+}
