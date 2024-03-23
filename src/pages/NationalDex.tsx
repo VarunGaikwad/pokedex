@@ -16,41 +16,44 @@ export default function NationalDex() {
     [searchInput, setSearchInput] = useState<string>("");
 
   useEffect(() => {
-    const { type, order } = sort;
-    const getFiltedSorted = () => {
-      const result = PokemonList.filter((item) =>
-        item.pokemon_species.name.includes(searchInput.toLocaleLowerCase())
-      );
+    const { type, order } = sort,
+      getFiltedSorted = () => {
+        const result = PokemonList.filter((item) =>
+          item.pokemon_species.name.includes(searchInput.toLocaleLowerCase())
+        );
 
-      if (type === "number") {
-        if (order === "asc")
+        if (type === "number") {
+          if (order === "asc")
+            return [
+              ...result.sort(
+                (first, second) => first.entry_number - second.entry_number
+              ),
+            ];
+
           return [
             ...result.sort(
-              (first, second) => first.entry_number - second.entry_number
+              (first, second) => -first.entry_number + second.entry_number
+            ),
+          ];
+        }
+        if (order === "asc")
+          return [
+            ...result.sort((first, second) =>
+              first.pokemon_species.name.localeCompare(
+                second.pokemon_species.name
+              )
             ),
           ];
 
         return [
-          ...result.sort(
-            (first, second) => -first.entry_number + second.entry_number
-          ),
-        ];
-      }
-      if (order === "asc")
-        return [
           ...result.sort((first, second) =>
-            first.pokemon_species.name.localeCompare(
-              second.pokemon_species.name
+            second.pokemon_species.name.localeCompare(
+              first.pokemon_species.name
             )
           ),
         ];
+      };
 
-      return [
-        ...result.sort((first, second) =>
-          second.pokemon_species.name.localeCompare(first.pokemon_species.name)
-        ),
-      ];
-    };
     setFilteredPokemonList(getFiltedSorted);
   }, [sort, searchInput]);
 
