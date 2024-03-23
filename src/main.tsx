@@ -1,6 +1,7 @@
 import ReactDOM from "react-dom/client";
 import "./styles/global.css";
-import React from "react";
+import { ChakraProvider } from "@chakra-ui/react";
+
 import {
   Navigate,
   Route,
@@ -24,7 +25,7 @@ const router = createBrowserRouter(
 );
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
+  <ChakraProvider>
     <RouterProvider router={router} />
-  </React.StrictMode>
+  </ChakraProvider>
 );

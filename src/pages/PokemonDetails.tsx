@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { PokemonDetailsType } from "../data/common";
 import { axiosRequest } from "../service/api";
+import { useParams } from "react-router-dom";
 
 export default function PokemonDetails() {
   const { id } = useParams(),
-    [pokemonInfo, setPokemonInfo] = useState({});
+    [pokemonInfo, setPokemonInfo] = useState<PokemonDetailsType | null>(null);
 
   useEffect(() => {
     const fetchPokemonInfo = async () => {
       const response = await axiosRequest(`/api/v2/pokemon-species/${id}`);
       setPokemonInfo(response);
     };
+
     fetchPokemonInfo();
   }, [id]);
 
-  return <pre>{JSON.stringify(pokemonInfo, null, 4)}</pre>;
+  return <div></div>;
 }
