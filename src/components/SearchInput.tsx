@@ -30,7 +30,10 @@ export default function SearchInput({
         placeholder="Pokémon"
       />
       <InputRightElement cursor="pointer">
-        <CloseIcon onClick={() => setSearchInput("")} />
+        <CloseIcon
+          visibility={!searchInput ? "hidden" : "visible"}
+          onClick={() => setSearchInput("")}
+        />
       </InputRightElement>
     </InputGroup>
   );

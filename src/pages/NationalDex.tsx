@@ -69,12 +69,12 @@ export default function NationalDex() {
   return (
     <div className="bg-primary select-none">
       <div className="container flex flex-col mx-auto h-screen gap-1 p-1 pt-0">
-        <div>
-          <span className="flex items-center gap-1 font-bold text-2xl text-white">
+        <div className="flex flex-col md:flex-row space-y-1 md:items-center">
+          <span className="flex gap-1 font-bold text-2xl text-white">
             <img className="size-7" src={PokeBall} />
             Pokédex
           </span>
-          <div className="flex items-center gap-1">
+          <div className="flex-grow md:ml-2 flex gap-1">
             <SearchInput {...{ searchInput, setSearchInput }} />
             <SortMenu {...{ sort, setSort }} />
           </div>

@@ -96,3 +96,16 @@ h6 {
 .list-content::-webkit-scrollbar {
     display: none;
 }
+
+.detail-page::before {
+    --size: 12.5em;
+    content: "";
+    background-image: url("../assets/pokeball.svg");
+    position: absolute;
+    width: var(--size);
+    height: var(--size);
+    background-repeat: no-repeat;
+    opacity: .5;
+    top: 0;
+    right: 0;
+}
