@@ -226,6 +226,11 @@ h6 {
   background-color: var(--bg-primary);
 }
 
+.text-2xs {
+  font-size: 0.5rem;
+  line-height: .75rem;
+}
+
 .search-shadow {
   box-shadow: inset 0 0 0.25rem var(--bg-primary);
   border: none !important;

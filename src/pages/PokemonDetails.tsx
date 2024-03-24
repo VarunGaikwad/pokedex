@@ -1,26 +1,49 @@
 import { Icon } from "@chakra-ui/react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import {
+  centimeterToFeet,
+  FlavorTextType,
   image_base_url,
+  kilogramToPound,
+  PokemonInfoType,
   pokemonNumberPadding,
-  PokemonResponse,
+  PokemonSpeciesType,
+  randomNumber,
 } from "../data/common";
 import PokemonTypeCard from "../components/PokemonTypeCard";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { axiosRequest } from "../service/api";
+import { TbWeight } from "react-icons/tb";
+import { GiMagicPalm } from "react-icons/gi";
+import { AiOutlineLineHeight } from "react-icons/ai";
+import AboutCard from "../components/AboutCard";
+import PokemonStats from "../components/PokemonStats";
 export default function PokemonDetails() {
   const { id } = useParams(),
-    [pokemonInfo, setPokemonInfo] = useState<PokemonResponse>(),
-    [randomType, setRandomType] = useState<string>("");
+    [pokemonInfo, setPokemonInfo] = useState<PokemonInfoType>(),
+    [pokemonDetails, setPokemonDetails] = useState<PokemonSpeciesType>(),
+    [randomType, setRandomType] = useState<string>(""),
+    minNum = 1,
+    maxNum = 1025;
 
   useEffect(() => {
     const fetchPokemonInfo = async () => {
-      const response = await axiosRequest(`/api/v2/pokemon/${id}`);
-      setPokemonInfo({ ...response });
+      const responseInfo = await axiosRequest(`/api/v2/pokemon/${id}`),
+        responseDetails = await axiosRequest(`/api/v2/pokemon-species/${id}`);
+      setPokemonInfo({ ...responseInfo });
+
+      responseDetails.flavor_text_entries =
+        responseDetails.flavor_text_entries.filter(
+          (element: FlavorTextType) => element.language.name === "en"
+        );
+
+      setPokemonDetails({ ...responseDetails });
+
       setRandomType(
-        response.types[Math.floor(Math.random() * response?.types.length)].type
-          ?.name
+        responseInfo.types[
+          Math.floor(Math.random() * responseInfo?.types.length)
+        ].type?.name
       );
     };
 
@@ -35,10 +58,14 @@ export default function PokemonDetails() {
             <span className="text-2xl font-semibold text-white text-nowrap">
               {pokemonInfo?.name}
             </span>
-            <Icon color="white" boxSize={10} as={IoIosArrowBack} />
+            {minNum !== pokemonInfo?.id && (
+              <Link to={`/pokedex/${Number(id) - 1}`}>
+                <Icon color="white" boxSize={10} as={IoIosArrowBack} />
+              </Link>
+            )}
           </div>
           <img
-            className="w-52 translate-y-20"
+            className="w-52 translate-y-14"
             loading="lazy"
             src={`${image_base_url}/other/official-artwork/${id}.png`}
           />
@@ -46,17 +73,79 @@ export default function PokemonDetails() {
             <span className="text-sm font-semibold text-white">
               #{pokemonNumberPadding(pokemonInfo?.id.toString() || "")}
             </span>
-            <Icon color="white" boxSize={10} as={IoIosArrowForward} />
+            {maxNum !== pokemonInfo?.id && (
+              <Link to={`/pokedex/${Number(id) + 1}`}>
+                <Icon color="white" boxSize={10} as={IoIosArrowForward} />
+              </Link>
+            )}
           </div>
         </div>
         <div className="flex-grow-2 rounded-md list-content">
-          <div className="text-center mt-16">
+          <div className="mt-12">
             <div className="flex justify-center gap-4">
-              {pokemonInfo?.types.map((element) => (
-                <PokemonTypeCard>{element.type.name}</PokemonTypeCard>
+              {pokemonInfo?.types.map((element, idx) => (
+                <PokemonTypeCard key={idx}>{element.type.name}</PokemonTypeCard>
               ))}
             </div>
-            <span className="text-lg font-semibold">About</span>
+            <span
+              className={`pt-4 flex justify-center text-lg font-bold text-${randomType}`}
+            >
+              About
+            </span>
+            <div className="flex justify-evenly">
+              <AboutCard
+                title="Weight"
+                icon={TbWeight}
+                details={kilogramToPound(pokemonInfo?.weight) + " lbs"}
+              />
+              <AboutCard
+                title="Height"
+                icon={AiOutlineLineHeight}
+                details={
+                  centimeterToFeet(pokemonInfo?.height).replace(".", "' ") + '"'
+                }
+              />
+              <AboutCard
+                title="Abilities"
+                icon={GiMagicPalm}
+                details={
+                  (pokemonInfo?.abilities.length === 1
+                    ? pokemonInfo.abilities[0]
+                    : pokemonInfo?.abilities.find((item) => item.is_hidden)
+                  )?.ability?.name || ""
+                }
+                hiddenDetails={
+                  pokemonInfo?.abilities.length === 1
+                    ? ""
+                    : (
+                        pokemonInfo?.abilities.find(
+                          (item) => !item.is_hidden
+                        ) || {}
+                      ).ability?.name || ""
+                }
+              />
+            </div>
+            <div className="text-center mt-2 px-2 text-sm">
+              {(
+                pokemonDetails?.flavor_text_entries[
+                  randomNumber(pokemonDetails?.flavor_text_entries.length)
+                ]?.flavor_text || ""
+              ).replace(/\f/g, " ")}
+            </div>
+            <span
+              className={`pt-4 flex justify-center text-lg font-bold text-${randomType}`}
+            >
+              Base Stat
+            </span>
+            <div className={`flex-grow text-${randomType} pt-6 px-2 md:px-24`}>
+              {pokemonInfo?.stats.map((stats, idx) => (
+                <PokemonStats
+                  key={idx}
+                  title={stats.stat.name}
+                  value={stats.base_stat}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
