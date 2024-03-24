@@ -89,6 +89,10 @@ h6 {
 }
 
 .list-content {
-    background-color: #fff;
+    background-color: #eee;
     box-shadow: inset 1px 1px .5rem #999, inset -1px -1px .5rem #999;
+}
+
+.list-content::-webkit-scrollbar {
+    display: none;
 }

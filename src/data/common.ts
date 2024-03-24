@@ -101,5 +101,6 @@ export interface SortMenuProps {
 }
 
 export interface SearchInputProps {
+  searchInput: string;
   setSearchInput: React.Dispatch<React.SetStateAction<string>>;
 }

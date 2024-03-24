@@ -7,13 +7,17 @@ import {
 } from "@chakra-ui/react";
 import { SearchInputProps } from "../data/common";
 
-export default function SearchInput({ setSearchInput }: SearchInputProps) {
+export default function SearchInput({
+  searchInput,
+  setSearchInput,
+}: SearchInputProps) {
   return (
     <InputGroup>
       <InputLeftElement pointerEvents="none">
         <SearchIcon />
       </InputLeftElement>
       <Input
+        value={searchInput}
         onChange={(event) => {
           setSearchInput(event.target.value);
         }}
@@ -26,7 +30,7 @@ export default function SearchInput({ setSearchInput }: SearchInputProps) {
         placeholder="Pokémon"
       />
       <InputRightElement cursor="pointer">
-        <CloseIcon />
+        <CloseIcon onClick={() => setSearchInput("")} />
       </InputRightElement>
     </InputGroup>
   );

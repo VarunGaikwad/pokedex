@@ -7,13 +7,20 @@ import PokemonCard from "../components/PokemonCard";
 import PokemonList from "../data/pokemon_list.json";
 
 export default function NationalDex() {
-  const [sort, setSort] = useState<SortCriteria>({
-      order: "asc",
-      type: "number",
-    }),
+  const [sort, setSort] = useState<SortCriteria>(
+      JSON.parse(
+        localStorage.getItem("sortSetting") ||
+          JSON.stringify({
+            order: "asc",
+            type: "number",
+          })
+      )
+    ),
     [filteredPokemonList, setFilteredPokemonList] =
       useState<PokemonListType[]>(PokemonList),
-    [searchInput, setSearchInput] = useState<string>("");
+    [searchInput, setSearchInput] = useState<string>(
+      localStorage.getItem("searchInput") || ""
+    );
 
   useEffect(() => {
     const { type, order } = sort,
@@ -55,6 +62,8 @@ export default function NationalDex() {
       };
 
     setFilteredPokemonList(getFiltedSorted);
+    localStorage.setItem("sortSetting", JSON.stringify(sort));
+    localStorage.setItem("searchInput", searchInput);
   }, [sort, searchInput]);
 
   return (
@@ -71,7 +80,7 @@ export default function NationalDex() {
           </div>
         </div>
         <div className="flex-grow rounded-md list-content capitalize overflow-y-auto">
-          <div className="flex flex-wrap justify-evenly overflow-y-auto">
+          <div className="grid gap-4 grid-cols-3 p-2 md:grid-cols-6">
             {filteredPokemonList.map(
               ({ entry_number, pokemon_species, types }, idx) => (
                 <PokemonCard
