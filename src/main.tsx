@@ -17,8 +17,8 @@ const router = createBrowserRouter(
     <Route path="/">
       <Route index element={<Navigate to="pokedex" replace />} />
       <Route path="pokedex">
-        <Route path="" element={<NationalDex />} />
-        <Route path=":id" element={<PokemonDetails />} />
+        <Route path="" element={<PokemonDetails />} />
+        <Route path=":id" element={<NationalDex />} />
       </Route>
     </Route>
   )

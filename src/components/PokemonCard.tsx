@@ -18,7 +18,7 @@ export default function PokemonCard({
     fetchImage.onload = () => {
       setTimeout(() => {
         setPokeImg(fetchImage.src);
-      }, 100);
+      }, 50 * entry_number);
     };
   }, [entry_number]);
 
@@ -35,7 +35,13 @@ export default function PokemonCard({
       <Text className="text-xs" opacity={0.75} align="end">
         #{pokemonNumberPadding(entry_number.toString())}
       </Text>
-      <Image height={50} loading="lazy" margin="auto" src={pokeImg} />
+      <Image
+        height={50}
+        loading="lazy"
+        margin="auto"
+        src={pokeImg}
+        alt={pokemon_species.name}
+      />
       <Text marginTop={1} className="text-xs font-semibold" align="center">
         {pokemon_species.name}
       </Text>
