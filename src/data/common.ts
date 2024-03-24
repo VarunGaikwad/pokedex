@@ -29,66 +29,54 @@ export function pokemonNumberPadding(num: string) {
 
 export { base_url, image_base_url };
 
-export interface PokemonDetailsType {
-  base_happiness: number;
-  capture_rate: number;
-  color: PokemonCommonType;
-  egg_groups: PokemonCommonType[];
-  evolution_chain: Omit<PokemonCommonType, "name">;
-  evolves_from_species: PokemonCommonType;
-  flavor_text_entries: PokemonFlavourType[];
-  form_descriptions: PokemonCommonType[];
-  forms_switchable: boolean;
-  gender_rate: number;
-  genera: PokemonGeneraType[];
-  generation: PokemonCommonType;
-  growth_rate: PokemonCommonType;
-  habitat: PokemonCommonType;
-  has_gender_differences: boolean;
-  hatch_counter: number;
+interface Type {
+  slot: number;
+  type: {
+    name: string;
+    url: string;
+  };
+}
+
+interface Ability {
+  ability: {
+    name: string;
+    url: string;
+  };
+  is_hidden: boolean;
+  slot: number;
+}
+
+interface Stat {
+  base_stat: number;
+  effort: number;
+  stat: {
+    name: string;
+    url: string;
+  };
+}
+
+interface Sprites {
+  back_default: string | null;
+  back_female: string | null;
+  back_shiny: string | null;
+  back_shiny_female: string | null;
+  front_default: string;
+  front_female: string | null;
+  front_shiny: string;
+  front_shiny_female: string | null;
+}
+
+export interface PokemonResponse {
+  name: string;
   id: number;
-  is_baby: boolean;
-  is_legendary: boolean;
-  is_mythical: boolean;
-  name: string;
-  names: PokemonNamesType[];
-  order: number;
-  pal_park_encounters: PokemonPalParkType[];
-  pokedex_numbers: PokemonDexNumberType[];
-  shape: PokemonCommonType;
-  varieties: PokemonVarietyType;
+  height: number;
+  weight: number;
+  types: Type[];
+  abilities: Ability[];
+  stats: Stat[];
+  sprites: Sprites;
 }
 
-interface PokemonFlavourType {
-  flavor_text: string;
-  language: PokemonCommonType;
-}
-
-interface PokemonGeneraType {
-  genus: string;
-  language: PokemonCommonType;
-}
-
-interface PokemonNamesType {
-  name: string;
-  language: PokemonCommonType;
-}
-
-interface PokemonPalParkType {
-  base_score: number;
-  rate: number;
-  area: PokemonCommonType;
-}
-
-interface PokemonDexNumberType {
-  entry_number: number;
-  pokedex: PokemonCommonType;
-}
-
-interface PokemonVarietyType {
-  is_default: boolean;
-  pokemon: PokemonCommonType;
-}
 
 export interface SortCriteria {
   order: "asc" | "desc";

@@ -6,6 +6,7 @@ import {
 } from "../data/common";
 import missingno from "../assets/missingno.png";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 export default function PokemonCard({
   entry_number,
   pokemon_species,
@@ -23,28 +24,30 @@ export default function PokemonCard({
   }, [entry_number]);
 
   return (
-    <Flex
-      maxHeight="max-content"
-      direction="column"
-      height="max-content"
-      bgColor="#eee"
-      borderRadius="1rem"
-      boxShadow="0px 0px 10px 5px rgba(0,0,0,0.1),inset 0px 3.5rem 5px 0px white"
-      padding={2}
-    >
-      <Text className="text-xs" opacity={0.75} align="end">
-        #{pokemonNumberPadding(entry_number.toString())}
-      </Text>
-      <Image
-        height={50}
-        loading="lazy"
-        margin="auto"
-        src={pokeImg}
-        alt={pokemon_species.name}
-      />
-      <Text marginTop={1} className="text-xs font-semibold" align="center">
-        {pokemon_species.name}
-      </Text>
-    </Flex>
+    <Link to={`/pokedex/${entry_number}`}>
+      <Flex
+        maxHeight="max-content"
+        direction="column"
+        height="max-content"
+        bgColor="#eee"
+        borderRadius="1rem"
+        boxShadow="0px 0px 10px 5px rgba(0,0,0,0.1),inset 0px 3.5rem 5px 0px white"
+        padding={2}
+      >
+        <Text className="text-xs" opacity={0.75} align="end">
+          #{pokemonNumberPadding(entry_number.toString())}
+        </Text>
+        <Image
+          height={50}
+          loading="lazy"
+          margin="auto"
+          src={pokeImg}
+          alt={pokemon_species.name}
+        />
+        <Text marginTop={1} className="text-xs font-semibold" align="center">
+          {pokemon_species.name}
+        </Text>
+      </Flex>
+    </Link>
   );
 }
