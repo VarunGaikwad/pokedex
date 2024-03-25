@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { base_url } from "../data/common";
 
 const api = axios.create({
@@ -15,7 +15,13 @@ interface AxiosRequestOptions {
 export function axiosRequest(url: string, options: AxiosRequestOptions = {
     method: "GET"
 }) {
-    return api(url, options)
-        .then(response => response.data)
-        .catch(error => Promise.reject(error?.response?.data?.message ?? "Error"))
+    return api(url, options).then(response => response.data).catch(error => {
+        if (axios.isAxiosError(error)) {
+            const { message, response } = error as AxiosError;
+            return Promise.reject({ message, response })
+        }
+        const { message } = error as Error;
+        return Promise.reject({ message });
+
+    })
 }

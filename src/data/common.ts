@@ -3,6 +3,8 @@ const base_url = "https://pokeapi.co";
 const image_base_url =
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon";
 
+const unown_image_base_url = "https://img.pokemondb.net/artwork";
+
 export interface PokemonListType {
   entry_number: number;
   pokemon_species: PokemonCommonType;
@@ -27,7 +29,7 @@ export function pokemonNumberPadding(num: string) {
   return num;
 }
 
-export { base_url, image_base_url };
+export { base_url, image_base_url, unown_image_base_url };
 
 interface Type {
   slot: number;
@@ -201,3 +203,38 @@ export interface FlavorTextType {
 
 
 export const randomNumber = (max: number) => Math.floor(Math.random() * max)
+
+export interface ErrorResponseType {
+  message: string;
+  response: {
+    data: string;
+    status: number;
+    statusText: string;
+    headers: {
+      [key: string]: string;
+    };
+    config: {
+      transitional: {
+        silentJSONParsing: boolean;
+        forcedJSONParsing: boolean;
+        clarifyTimeoutError: boolean;
+      };
+      adapter: string[] | undefined;
+      transformRequest: ((data: unknown, headers?: unknown) => unknown)[] | undefined;
+      transformResponse: ((data: unknown) => unknown)[] | undefined;
+      timeout: number;
+      xsrfCookieName: string;
+      xsrfHeaderName: string;
+      maxContentLength: number;
+      maxBodyLength: number;
+      env: object;
+      headers: {
+        Accept: string;
+      };
+      baseURL: string;
+      method: string;
+      url: string;
+    };
+    request: object;
+  };
+}

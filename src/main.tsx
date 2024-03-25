@@ -1,9 +1,7 @@
 import ReactDOM from "react-dom/client";
 import "./styles/global.css";
 import { ChakraProvider } from "@chakra-ui/react";
-
 import {
-  Navigate,
   Route,
   RouterProvider,
   createBrowserRouter,
@@ -15,11 +13,8 @@ import PokemonDetails from "./pages/PokemonDetails.tsx";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/">
-      <Route index element={<Navigate to="pokedex" replace />} />
-      <Route path="pokedex">
-        <Route path="" element={<NationalDex />} />
-        <Route path=":id" element={<PokemonDetails />} />
-      </Route>
+      <Route path="" element={<NationalDex />} />
+      <Route path="/:id" element={<PokemonDetails />} />
     </Route>
   )
 );

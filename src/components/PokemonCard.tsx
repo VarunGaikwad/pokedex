@@ -21,7 +21,7 @@ export default function PokemonCard({
   }, [entry_number]);
 
   return (
-    <Link to={`/pokedex/${entry_number}`}>
+    <Link to={`/${entry_number}`}>
       <div
         className="h-max bg-slate-100 rounded-md p-2 flex flex-col"
         style={{

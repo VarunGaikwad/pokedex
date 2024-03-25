@@ -2,6 +2,7 @@ import { Icon } from "@chakra-ui/react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import {
   centimeterToFeet,
+  ErrorResponseType,
   FlavorTextType,
   image_base_url,
   kilogramToPound,
@@ -19,36 +20,45 @@ import { GiMagicPalm } from "react-icons/gi";
 import { AiOutlineLineHeight } from "react-icons/ai";
 import AboutCard from "../components/AboutCard";
 import PokemonStats from "../components/PokemonStats";
+import NotFound from "./NotFound";
 export default function PokemonDetails() {
   const { id } = useParams(),
     [pokemonInfo, setPokemonInfo] = useState<PokemonInfoType>(),
     [pokemonDetails, setPokemonDetails] = useState<PokemonSpeciesType>(),
     [randomType, setRandomType] = useState<string>(""),
+    [errorText, setErrorText] = useState<ErrorResponseType>(),
     minNum = 1,
     maxNum = 1025;
 
   useEffect(() => {
     const fetchPokemonInfo = async () => {
-      const responseInfo = await axiosRequest(`/api/v2/pokemon/${id}`),
-        responseDetails = await axiosRequest(`/api/v2/pokemon-species/${id}`);
-      setPokemonInfo({ ...responseInfo });
+      try {
+        const responseInfo = await axiosRequest(`/api/v2/pokemon/${id}`),
+          responseDetails = await axiosRequest(`/api/v2/pokemon-species/${id}`);
+        setPokemonInfo({ ...responseInfo });
 
-      responseDetails.flavor_text_entries =
-        responseDetails.flavor_text_entries.filter(
-          (element: FlavorTextType) => element.language.name === "en"
+        responseDetails.flavor_text_entries =
+          responseDetails.flavor_text_entries.filter(
+            (element: FlavorTextType) => element.language.name === "en"
+          );
+
+        setPokemonDetails({ ...responseDetails });
+
+        setRandomType(
+          responseInfo.types[
+            Math.floor(Math.random() * responseInfo?.types.length)
+          ].type?.name
         );
-
-      setPokemonDetails({ ...responseDetails });
-
-      setRandomType(
-        responseInfo.types[
-          Math.floor(Math.random() * responseInfo?.types.length)
-        ].type?.name
-      );
+      } catch (error) {
+        setErrorText(error as ErrorResponseType);
+      }
     };
-
     fetchPokemonInfo();
   }, [id]);
+
+  if (errorText?.response.status === 404) {
+    return <NotFound />;
+  }
 
   return (
     <div className={`bg-${randomType} select-none text-sm`}>
@@ -59,7 +69,7 @@ export default function PokemonDetails() {
               {pokemonInfo?.name}
             </span>
             {minNum !== pokemonInfo?.id && (
-              <Link to={`/pokedex/${Number(id) - 1}`}>
+              <Link to={`/${Number(id) - 1}`}>
                 <Icon color="white" boxSize={10} as={IoIosArrowBack} />
               </Link>
             )}
@@ -74,7 +84,7 @@ export default function PokemonDetails() {
               #{pokemonNumberPadding(pokemonInfo?.id.toString() || "")}
             </span>
             {maxNum !== pokemonInfo?.id && (
-              <Link to={`/pokedex/${Number(id) + 1}`}>
+              <Link to={`/${Number(id) + 1}`}>
                 <Icon color="white" boxSize={10} as={IoIosArrowForward} />
               </Link>
             )}
