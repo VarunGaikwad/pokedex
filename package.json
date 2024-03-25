@@ -6,7 +6,7 @@
   "homepage": "https://VarunGaikwad.github.io/pokedex",
   "scripts": {
     "dev": "vite",
-    "deploy": "vite build && gh-pages -d dist",
+    "deploy": "tsc && vite build && gh-pages -d dist",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
