@@ -69,7 +69,7 @@ export default function PokemonDetails() {
               {pokemonInfo?.name}
             </span>
             {minNum !== pokemonInfo?.id && (
-              <Link to={`/${Number(id) - 1}`}>
+              <Link to={`/pokedex/${Number(id) - 1}`}>
                 <Icon color="white" boxSize={10} as={IoIosArrowBack} />
               </Link>
             )}
@@ -84,7 +84,7 @@ export default function PokemonDetails() {
               #{pokemonNumberPadding(pokemonInfo?.id.toString() || "")}
             </span>
             {maxNum !== pokemonInfo?.id && (
-              <Link to={`/${Number(id) + 1}`}>
+              <Link to={`/pokedex/${Number(id) + 1}`}>
                 <Icon color="white" boxSize={10} as={IoIosArrowForward} />
               </Link>
             )}
