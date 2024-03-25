@@ -52,7 +52,7 @@ export default function PokemonDetails() {
 
   return (
     <div className={`bg-${randomType} select-none text-sm`}>
-      <div className="container flex flex-col mx-auto h-screen p-2">
+      <div className="container flex flex-col mx-auto h-screen p-2 relative detail-page">
         <div className="flex items-start justify-evenly capitalize">
           <div className="w-1/6 flex flex-col justify-between items-start h-full">
             <span className="text-2xl font-semibold text-white text-nowrap">

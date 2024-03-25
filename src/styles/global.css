@@ -280,3 +280,20 @@ h6 {
 .flex-grow-2 {
   flex-grow: 2;
 }
+
+.detail-page::before {
+  content: "";
+  background-image: url("../assets/pokeball.svg");
+  background-repeat: no-repeat;
+  position: absolute;
+  width: 10rem;
+  height: 10rem;
+  top: 0;
+  right: 10%;
+}
+
+@media (min-width: 768px) {
+  .detail-page::before {
+    right: 25%;
+  }
+}

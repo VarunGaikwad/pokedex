@@ -1,4 +1,3 @@
-import { Flex, Image, Text } from "@chakra-ui/react";
 import {
   image_base_url,
   PokemonListType,
@@ -14,40 +13,36 @@ export default function PokemonCard({
   const [pokeImg, setPokeImg] = useState<string>(missingno);
 
   useEffect(() => {
-    const fetchImage = new window.Image();
+    const fetchImage = new Image();
     fetchImage.src = `${image_base_url}/other/official-artwork/${entry_number}.png`;
     fetchImage.onload = () => {
-      setTimeout(() => {
-        setPokeImg(fetchImage.src);
-      }, 50 * entry_number);
+      setPokeImg(fetchImage.src);
     };
   }, [entry_number]);
 
   return (
     <Link to={`/pokedex/${entry_number}`}>
-      <Flex
-        maxHeight="max-content"
-        direction="column"
-        height="max-content"
-        bgColor="#eee"
-        borderRadius="1rem"
-        boxShadow="0px 0px 10px 5px rgba(0,0,0,0.1),inset 0px 3.5rem 5px 0px white"
-        padding={2}
+      <div
+        className="h-max bg-slate-100 rounded-md p-2 flex flex-col"
+        style={{
+          boxShadow:
+            "0px 0px 10px 5px rgba(0,0,0,0.1),inset 0px 3.5rem 5px 0px white",
+        }}
       >
-        <Text className="text-xs" opacity={0.75} align="end">
+        <span className="opacity-50 text-end">
           #{pokemonNumberPadding(entry_number.toString())}
-        </Text>
-        <Image
-          height={50}
+        </span>
+        <img
+          height={20}
           loading="lazy"
-          margin="auto"
+          className="m-auto"
           src={pokeImg}
           alt={pokemon_species.name}
         />
-        <Text marginTop={1} className="text-xs font-semibold" align="center">
+        <span className="mt-1 text-sm font-semibold text-center">
           {pokemon_species.name}
-        </Text>
-      </Flex>
+        </span>
+      </div>
     </Link>
   );
 }

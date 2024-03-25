@@ -9,9 +9,9 @@ export default function AboutCard({
 }: AboutCardType) {
   return (
     <div className="flex flex-col gap-y-2 items-center p-2">
-      <div className="flex items-end gap-2 capitalize text-xs">
+      <div className="flex items-end gap-2 capitalize">
         <Icon boxSize={8} as={icon} />
-        <div className="text-center">
+        <div className="text-center text-xs">
           {details}
           <br />
           <span className="text-2xs">{hiddenDetails}</span>
