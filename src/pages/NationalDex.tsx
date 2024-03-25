@@ -72,7 +72,7 @@ export default function NationalDex() {
         <div className="flex flex-col md:flex-row space-y-1 md:items-center">
           <span className="flex gap-1 font-bold text-2xl text-white">
             <img className="size-7" src={PokeBall} />
-            Pokédex
+            Varun Gaikwad | Pokédex
           </span>
           <div className="flex-grow md:ml-2 flex gap-1">
             <SearchInput {...{ searchInput, setSearchInput }} />

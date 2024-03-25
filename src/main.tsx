@@ -10,6 +10,7 @@ import {
   createRoutesFromElements,
 } from "react-router-dom";
 import PokemonDetails from "./pages/PokemonDetails.tsx";
+import NotFound from "./pages/NotFound.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -19,6 +20,7 @@ const router = createBrowserRouter(
         <Route path="" element={<NationalDex />} />
         <Route path=":id" element={<PokemonDetails />} />
       </Route>
+      <Route path="*" element={<NotFound />} />
     </Route>
   )
 );
