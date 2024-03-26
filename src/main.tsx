@@ -15,8 +15,8 @@ import NotFound from "./pages/NotFound.tsx";
 const router = createHashRouter(
   createRoutesFromElements(
     <Route path="/">
-      <Route index element={<Navigate to="pokedex" replace />} />
-      <Route path="pokedex">
+      <Route index element={<Navigate to="pokemon" replace />} />
+      <Route path="pokemon">
         <Route path="" element={<NationalDex />} />
         <Route path=":id" element={<PokemonDetails />} />
       </Route>
