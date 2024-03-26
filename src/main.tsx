@@ -6,13 +6,13 @@ import {
   Navigate,
   Route,
   RouterProvider,
-  createBrowserRouter,
+  createHashRouter,
   createRoutesFromElements,
 } from "react-router-dom";
 import PokemonDetails from "./pages/PokemonDetails.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
-const router = createBrowserRouter(
+const router = createHashRouter(
   createRoutesFromElements(
     <Route path="/">
       <Route index element={<Navigate to="pokedex" replace />} />
