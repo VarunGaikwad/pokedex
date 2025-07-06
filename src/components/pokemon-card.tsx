@@ -1,21 +1,22 @@
-'use client';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Card, CardContent } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import type { PokemonListItem } from '@/lib/pokeapi';
+"use client";
+import Link from "next/link";
+import Image from "next/image";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { PokemonListItem } from "@/lib/pokeapi";
 
 interface PokemonCardProps {
   pokemon: PokemonListItem;
 }
 
 function getPokemonId(url: string): string {
-  const parts = url.split('/');
+  const parts = url.split("/");
   return parts[parts.length - 2];
 }
 
 export default function PokemonCard({ pokemon }: PokemonCardProps) {
   const pokemonId = getPokemonId(pokemon.url);
+  const isPriority = parseInt(pokemonId) <= 24;
   const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonId}.png`;
 
   return (
@@ -29,12 +30,14 @@ export default function PokemonCard({ pokemon }: PokemonCardProps) {
               fill
               className="object-contain p-4 group-hover:p-2 transition-all duration-300"
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-              priority={parseInt(pokemonId) <= 24}
+              {...(isPriority ? { priority: true } : { loading: "lazy" })}
               data-ai-hint="pokemon character"
             />
           </div>
           <div className="w-full p-2 bg-card-foreground/5 dark:bg-card-foreground/10 text-center">
-            <p className="capitalize font-semibold text-sm truncate">{pokemon.name.replace('-', ' ')}</p>
+            <p className="capitalize font-semibold text-sm truncate">
+              {pokemon.name.replace("-", " ")}
+            </p>
           </div>
         </CardContent>
       </Card>
