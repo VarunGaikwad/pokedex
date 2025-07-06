@@ -4,6 +4,28 @@ import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "Pokédex",
+  icons: {
+    icon: "/image/logo.png",
+    shortcut: "/image/logo.png",
+    apple: "/image/logo.png",
+  },
+  keywords: [
+    "Pokédex",
+    "Pokémon",
+    "Pokemon",
+    "Pokedex",
+    "Search Pokémon",
+    "Browse Pokémon",
+    "Manage Pokémon",
+    "React App",
+    "Next.js App",
+  ],
+  authors: [
+    {
+      name: "Varun",
+      url: "https://portfolio-drab-nine-70.vercel.app",
+    },
+  ],
   description:
     "A modern Pokédex to browse, search, and manage your favorite Pokémon.",
 };
@@ -16,6 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="icon" href="/image/logo.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
