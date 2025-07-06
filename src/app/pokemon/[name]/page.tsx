@@ -19,7 +19,7 @@ export default async function PokemonDetailPage({ params }: { params: { name: st
     (entry: any) => entry.language.name === 'en'
   );
 
-  const moves = pokemon.moves.map((move: any) => move.move.name);
+  const moves = pokemon.moves;
   const abilities = pokemon.abilities.map((ability: any) => ability.ability.name);
 
   return (

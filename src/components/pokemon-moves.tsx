@@ -12,7 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface PokemonMovesProps {
   pokemonName: string;
-  moves: string[];
+  moves: any[];
 }
 
 export default function PokemonMoves({ pokemonName, moves }: PokemonMovesProps) {
@@ -34,6 +34,44 @@ export default function PokemonMoves({ pokemonName, moves }: PokemonMovesProps) 
         setCategorizedMoves(result);
       }
     });
+  };
+
+  const renderCategorizedMoves = () => {
+    if (!categorizedMoves || Object.keys(categorizedMoves).length === 0) {
+      return <p className="text-muted-foreground">Could not categorize moves.</p>;
+    }
+
+    const moveCategories = Object.entries(categorizedMoves);
+
+    return (
+      <Accordion type="single" collapsible className="w-full" defaultValue="level-up">
+        {moveCategories.sort(([a], [b]) => a.localeCompare(b)).map(([method, moveList]) => (
+          <AccordionItem value={method} key={method}>
+            <AccordionTrigger className="text-lg capitalize">{method.replace('-', ' ')} ({moveList.length})</AccordionTrigger>
+            <AccordionContent>
+              {method === 'level-up' && Array.isArray(moveList) ? (
+                <div className="space-y-2">
+                  {(moveList as {name: string, level: number}[]).map((move) => (
+                    <div key={move.name} className="flex justify-between items-center bg-muted p-2 rounded-md text-sm capitalize">
+                      <span>{move.name.replace('-', ' ')}</span>
+                      <span className="font-bold text-primary">Lvl {move.level}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                  {Array.isArray(moveList) && moveList.map((move: string) => (
+                    <div key={move} className="bg-muted p-2 rounded-md text-sm text-center capitalize">
+                      {move.replace('-', ' ')}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    );
   };
 
   return (
@@ -59,27 +97,12 @@ export default function PokemonMoves({ pokemonName, moves }: PokemonMovesProps) 
               <Skeleton className="h-10 w-full" />
           </div>
         ) : categorizedMoves ? (
-          <Accordion type="single" collapsible className="w-full">
-            {Object.entries(categorizedMoves).sort(([a], [b]) => a.localeCompare(b)).map(([method, moveList]) => (
-              <AccordionItem value={method} key={method}>
-                <AccordionTrigger className="text-lg capitalize">{method.replace('-', ' ')} ({moveList.length})</AccordionTrigger>
-                <AccordionContent>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                    {moveList.sort().map(move => (
-                      <div key={move} className="bg-muted p-2 rounded-md text-sm text-center capitalize">
-                        {move.replace('-', ' ')}
-                      </div>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+          renderCategorizedMoves()
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-            {moves.sort().map(move => (
-              <div key={move} className="bg-muted p-2 rounded-md text-sm text-center capitalize truncate">
-                {move.replace('-', ' ')}
+            {moves.map(move => move.move.name).sort().map(moveName => (
+              <div key={moveName} className="bg-muted p-2 rounded-md text-sm text-center capitalize truncate">
+                {moveName.replace('-', ' ')}
               </div>
             ))}
           </div>
