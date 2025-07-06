@@ -14,12 +14,12 @@ import { getTypeData } from '@/lib/pokeapi';
 
 const ALL_TYPES = [ "normal", "fire", "water", "electric", "grass", "ice", "fighting", "poison", "ground", "flying", "psychic", "bug", "rock", "ghost", "dragon", "dark", "steel", "fairy"];
 
-export const CalculateWeaknessesInputSchema = z.object({
+const CalculateWeaknessesInputSchema = z.object({
   types: z.array(z.string()).describe("An array of the Pokémon's type names."),
 });
 export type CalculateWeaknessesInput = z.infer<typeof CalculateWeaknessesInputSchema>;
 
-export const CalculateWeaknessesOutputSchema = z.object({
+const CalculateWeaknessesOutputSchema = z.object({
   weaknesses4x: z.array(z.string()).describe('Types that deal 4x damage.'),
   weaknesses2x: z.array(z.string()).describe('Types that deal 2x damage.'),
   immunities: z.array(z.string()).describe('Types that deal 0x damage.'),
@@ -42,7 +42,7 @@ const calculateWeaknessesTool = ai.defineTool({
 
     const damageRelations = await Promise.all(types.map(type => getTypeData(type)));
 
-    const multipliers: { [type: string]: number } = {};
+    const multipliers: { [key: string]: number } = {};
     for (const type of ALL_TYPES) {
         multipliers[type] = 1;
     }
