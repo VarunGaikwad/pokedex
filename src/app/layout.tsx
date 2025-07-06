@@ -5,9 +5,9 @@ import { Toaster } from "@/components/ui/toaster";
 export const metadata: Metadata = {
   title: "Pokédex",
   icons: {
-    icon: "/image/logo.png",
-    shortcut: "/image/logo.png",
-    apple: "/image/logo.png",
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
   },
   keywords: [
     "Pokédex",
