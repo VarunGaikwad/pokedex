@@ -1,46 +1,32 @@
-'use client';
+'use server';
 
-import { useState, useTransition } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import type { CategorizeMovesOutput } from '@/ai/flows/categorize-moves';
 import { getCategorizedMoves } from '@/app/actions';
-import { useToast } from '@/hooks/use-toast';
-import { Wand2, Loader2 } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
 
 interface PokemonMovesProps {
   pokemonName: string;
   moves: any[];
 }
 
-export default function PokemonMoves({ pokemonName, moves }: PokemonMovesProps) {
-  const [isPending, startTransition] = useTransition();
-  const [categorizedMoves, setCategorizedMoves] = useState<CategorizeMovesOutput | null>(null);
-  const { toast } = useToast();
-
-  const handleCategorize = () => {
-    startTransition(async () => {
-      const result = await getCategorizedMoves({ pokemonName, moves });
-      if ('error' in result) {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: result.error,
-        });
-        setCategorizedMoves(null);
-      } else {
-        setCategorizedMoves(result);
-      }
-    });
-  };
+export default async function PokemonMoves({ pokemonName, moves }: PokemonMovesProps) {
+  const categorizedMovesResult = await getCategorizedMoves({ pokemonName, moves });
 
   const renderCategorizedMoves = () => {
-    if (!categorizedMoves || Object.keys(categorizedMoves).length === 0) {
-      return <p className="text-muted-foreground">Could not categorize moves.</p>;
+    if ('error' in categorizedMovesResult || !categorizedMovesResult || Object.keys(categorizedMovesResult).length === 0) {
+      return (
+         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+            {moves.map(move => move.move.name).sort().map(moveName => (
+              <div key={moveName} className="bg-muted p-2 rounded-md text-sm text-center capitalize truncate">
+                {moveName.replace('-', ' ')}
+              </div>
+            ))}
+          </div>
+      );
     }
-
+    
+    const categorizedMoves: CategorizeMovesOutput = categorizedMovesResult;
     const moveCategories = Object.entries(categorizedMoves);
 
     return (
@@ -77,36 +63,10 @@ export default function PokemonMoves({ pokemonName, moves }: PokemonMovesProps) 
   return (
     <Card>
       <CardHeader>
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <CardTitle className="font-headline">Learnable Moves</CardTitle>
-          <Button onClick={handleCategorize} disabled={isPending}>
-            {isPending ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Wand2 className="mr-2 h-4 w-4" />
-            )}
-            Categorize with AI
-          </Button>
-        </div>
+        <CardTitle className="font-headline">Learnable Moves</CardTitle>
       </CardHeader>
       <CardContent>
-        {isPending ? (
-          <div className="space-y-4">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-          </div>
-        ) : categorizedMoves ? (
-          renderCategorizedMoves()
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-            {moves.map(move => move.move.name).sort().map(moveName => (
-              <div key={moveName} className="bg-muted p-2 rounded-md text-sm text-center capitalize truncate">
-                {moveName.replace('-', ' ')}
-              </div>
-            ))}
-          </div>
-        )}
+        {renderCategorizedMoves()}
       </CardContent>
     </Card>
   );
