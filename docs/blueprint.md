@@ -1,4 +1,4 @@
-# **App Name**: Pocket Monster Manifest
+# **App Name**: Pokédex
 
 ## Core Features:
 
