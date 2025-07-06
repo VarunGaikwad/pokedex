@@ -32,11 +32,32 @@ export const getPokemonDetails = async (name: string) => {
     const speciesData = await speciesResponse.json();
     data.species_details = speciesData;
   } else {
-    data.species_details = { flavor_text_entries: [] }; // Graceful handling
+    data.species_details = { flavor_text_entries: [], genera: [], gender_rate: -1, evolution_chain: { url: null } };
   }
 
   return data;
 };
+
+export const getEvolutionChain = async (url: string) => {
+  if (!url) return null;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return null;
+    return response.json();
+  } catch (error) {
+    console.error("Failed to fetch evolution chain:", error);
+    return null;
+  }
+};
+
+export const getTypeData = async (typeName: string) => {
+    const response = await fetch(`${POKEAPI_BASE_URL}/type/${typeName}`);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch type data for ${typeName}`);
+    }
+    const data = await response.json();
+    return data.damage_relations;
+}
 
 export const getTypes = async (): Promise<PokemonListItem[]> => {
     const response = await fetch(`${POKEAPI_BASE_URL}/type`);
