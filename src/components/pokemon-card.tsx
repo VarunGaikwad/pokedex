@@ -20,9 +20,9 @@ export default function PokemonCard({ pokemon }: PokemonCardProps) {
 
   return (
     <Link href={`/pokemon/${pokemon.name}`} className="group">
-      <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-primary">
+      <Card className="overflow-hidden transition-all duration-300 hover:shadow-primary/20 hover:shadow-2xl hover:-translate-y-1 hover:border-primary">
         <CardContent className="p-0 flex flex-col items-center justify-center">
-          <div className="aspect-square w-full relative bg-card/50">
+          <div className="aspect-square w-full relative bg-gray-50">
             <Image
               src={imageUrl}
               alt={pokemon.name}

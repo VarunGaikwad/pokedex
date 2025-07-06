@@ -2,36 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @layer base {
   :root {
-    --background: 53 56% 94%;
-    --foreground: 222 47% 11%;
-    --card: 53 56% 98%;
-    --card-foreground: 222 47% 11%;
-    --popover: 53 56% 94%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 54 96% 66%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 199 93% 85%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 53 30% 88%;
-    --muted-foreground: 222 20% 40%;
-    --accent: 199 93% 74%;
-    --accent-foreground: 222 47% 11%;
+    --background: 53 56% 94%; /* Pale Yellow */
+    --foreground: 240 10% 3.9%;
+
+    --card: 53 56% 100%; /* Lighter than background */
+    --card-foreground: 240 10% 3.9%;
+
+    --popover: 53 56% 100%;
+    --popover-foreground: 240 10% 3.9%;
+
+    --primary: 54 96% 66%; /* Electric Yellow */
+    --primary-foreground: 240 5.9% 10%;
+
+    --secondary: 199 93% 85%; /* Lighter Sky Blue */
+    --secondary-foreground: 240 5.9% 10%;
+
+    --muted: 60 9.1% 97.8%;
+    --muted-foreground: 240 3.8% 46.1%;
+
+    --accent: 199 93% 74%; /* Sky Blue */
+    --accent-foreground: 240 5.9% 10%;
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
+
     --border: 53 20% 80%;
     --input: 53 20% 85%;
     --ring: 54 96% 66%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+
     --radius: 0.5rem;
   }
   .dark {
@@ -68,6 +68,8 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    background-image: radial-gradient(hsl(var(--border)) 1px, transparent 1px);
+    background-size: 1.5rem 1.5rem;
   }
 }
 

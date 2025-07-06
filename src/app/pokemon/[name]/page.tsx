@@ -43,7 +43,7 @@ export default async function PokemonDetailPage({ params }: { params: { name: st
   const genderRatio = getGenderRatio(pokemon.species_details.gender_rate);
 
   return (
-    <div className="container mx-auto p-4 md:p-8">
+    <div className="container mx-auto p-4 md:p-8 animate-fade-in-up opacity-0" style={{ animationFillMode: 'forwards', animationDelay: '200ms'}}>
       <Link href="/" className="mb-8 inline-flex items-center gap-2 text-primary hover:underline">
         <ArrowLeft className="h-4 w-4" />
         Back to Pokédex
@@ -102,7 +102,7 @@ export default async function PokemonDetailPage({ params }: { params: { name: st
           <div>
             <div className="flex items-center gap-4 mb-2">
                 <span className="text-2xl font-bold text-muted-foreground">#{pokemon.id.toString().padStart(4, '0')}</span>
-                <h1 className="text-5xl font-bold capitalize font-headline">{pokemon.name.replace('-', ' ')}</h1>
+                <h1 className="text-5xl font-black tracking-tight capitalize font-headline">{pokemon.name.replace('-', ' ')}</h1>
             </div>
             <div className="flex gap-2">
                 {types.map((typeName: string) => (
