@@ -50,6 +50,21 @@ export const getEvolutionChain = async (url: string) => {
   }
 };
 
+export const getMoveDetails = async (url: string) => {
+  if (!url) return null;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+        console.warn(`Failed to fetch move details from ${url}`);
+        return null;
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Failed to fetch move details:", error);
+    return null;
+  }
+};
+
 export const getTypeData = async (typeName: string) => {
     const response = await fetch(`${POKEAPI_BASE_URL}/type/${typeName}`);
     if (!response.ok) {
