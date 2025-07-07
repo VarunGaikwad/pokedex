@@ -31,10 +31,12 @@ A modern and responsive Pokedex built with **Next.js**, **Tailwind CSS**, and da
 
 ## 📦 Installation
 
+```bash
 git clone https://github.com/VarunGaikwad/pokedex
 cd pokedex-app
 npm install
 npm run dev
+```
 
 > The app will be running at: `http://localhost:3000`
 
@@ -42,10 +44,10 @@ npm run dev
 
 ## 🧱 Build for Production
 
+```bash
 npm run build
 npm run start
-
-````
+```
 
 - `npm run build`: Compiles the app for production
 - `npm run start`: Starts the production server (after build)
@@ -62,11 +64,11 @@ npm run start
 ## 📁 Folder Structure
 
 ```text
-/components       → Reusable UI components
-/lib              → Utility functions, API helpers
-/pages            → Route-based components (Next.js)
-/public           → Static assets (e.g., icons, images)
-/styles           → Global styles (if any)
+/components → Reusable UI components
+/lib → Utility functions, API helpers
+/pages → Route-based components (Next.js)
+/public → Static assets (e.g., icons, images)
+/styles → Global styles (if any)
 ```
 
 ---
@@ -103,4 +105,3 @@ Or connect the GitHub repository directly to Vercel for automatic deployments.
 ## 📜 License
 
 MIT License © Varun Gaikwad
-````
