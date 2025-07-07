@@ -31,20 +31,20 @@ A modern and responsive Pokedex built with **Next.js**, **Tailwind CSS**, and da
 
 ## 📦 Installation
 
-````bash
-git clone https://github.com/your-username/pokedex-app.git
+git clone https://github.com/VarunGaikwad/pokedex
 cd pokedex-app
 npm install
 npm run dev
+
 > The app will be running at: `http://localhost:3000`
 
 ---
 
 ## 🧱 Build for Production
 
-```bash
 npm run build
 npm run start
+
 ````
 
 - `npm run build`: Compiles the app for production
@@ -102,4 +102,5 @@ Or connect the GitHub repository directly to Vercel for automatic deployments.
 
 ## 📜 License
 
-MIT License © [Your Name]
+MIT License © Varun Gaikwad
+````
