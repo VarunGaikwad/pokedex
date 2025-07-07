@@ -4,9 +4,11 @@ import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { PokemonListItem } from "@/lib/pokeapi";
+import { POKEMON_PER_PAGE } from "./pokemon-list";
 
 interface PokemonCardProps {
   pokemon: PokemonListItem;
+  spirit: string;
 }
 
 function getPokemonId(url: string): string {
@@ -14,10 +16,68 @@ function getPokemonId(url: string): string {
   return parts[parts.length - 2];
 }
 
-export default function PokemonCard({ pokemon }: PokemonCardProps) {
+export default function PokemonCard({ pokemon, spirit }: PokemonCardProps) {
   const pokemonId = getPokemonId(pokemon.url);
-  const isPriority = parseInt(pokemonId) <= 24;
-  const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonId}.png`;
+  const isPriority = parseInt(pokemonId) <= POKEMON_PER_PAGE;
+  let imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonId}.png`;
+
+  switch (spirit) {
+    case "Default":
+      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`;
+      break;
+
+    case "Shiny":
+      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemonId}.png`;
+      break;
+
+    case "Dream World":
+      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${pokemonId}.svg`;
+      break;
+
+    case "Home":
+      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemonId}.png`;
+      break;
+
+    case "Home Shiny":
+      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/${pokemonId}.png`;
+      break;
+
+    case "Official Artwork":
+      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonId}.png`;
+      break;
+
+    case "Official Artwork Shiny":
+      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/${pokemonId}.png`;
+      break;
+
+    case "Showdown":
+      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/${pokemonId}.gif`;
+      break;
+
+    case "Showdown Shiny":
+      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/${pokemonId}.gif`;
+      break;
+
+    case "Back":
+      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${pokemonId}.png`;
+      break;
+
+    case "Back Shiny":
+      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/${pokemonId}.png`;
+      break;
+
+    case "Showdown Back":
+      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/${pokemonId}.gif`;
+      break;
+
+    case "Showdown Back Shiny":
+      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/${pokemonId}.gif`;
+      break;
+
+    default:
+      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonId}.png`;
+      break;
+  }
 
   return (
     <Link href={`/pokemon/${pokemon.name}`} className="group">

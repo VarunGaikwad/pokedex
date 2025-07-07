@@ -14,8 +14,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search } from "lucide-react";
+import { SpriteSwitcher } from "./sprite-switcher";
 
-const POKEMON_PER_PAGE = 2000;
+const POKEMON_PER_PAGE = 20;
 
 const fetchPokemonByType = async (type: string) => {
   const response = await fetch(`https://pokeapi.co/api/v2/type/${type}`);
@@ -27,6 +28,34 @@ const fetchPokemonByType = async (type: string) => {
 export default function PokemonList() {
   const [pokemon, setPokemon] = useState<PokemonListItem[]>([]);
   const [types, setTypes] = useState<PokemonListItem[]>([]);
+  const spirits: string[] = [
+    // Front Views
+    "Shiny",
+
+    // Dream World
+    "Dream World",
+
+    // Home
+    "Home",
+    "Home Shiny",
+
+    // Official Artwork
+    "Official Artwork",
+    "Official Artwork Shiny",
+
+    // Showdown Front
+    "Showdown",
+    "Showdown Shiny",
+
+    // Back Views
+    "Back",
+    "Back Shiny",
+
+    // Showdown Back
+    "Showdown Back",
+    "Showdown Back Shiny",
+  ];
+  const [selectedSpirit, setSelectedSpirit] = useState("Default");
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
@@ -46,8 +75,23 @@ export default function PokemonList() {
         : (prev) => [...prev, ...listResponse.results]
     );
     setOffset(currentOffset + POKEMON_PER_PAGE);
+    loadList(currentOffset + POKEMON_PER_PAGE);
     setHasMore(!!listResponse.next);
     setIsLoading(false);
+  };
+
+  const loadList = async (currentOffset = 0) => {
+    const listResponse = await getPokemonList(POKEMON_PER_PAGE, currentOffset);
+    setPokemon(
+      currentOffset === 0
+        ? listResponse.results
+        : (prev) => [...prev, ...listResponse.results]
+    );
+    setOffset(currentOffset + POKEMON_PER_PAGE);
+    setHasMore(!!listResponse.next);
+    if (listResponse.results.length === POKEMON_PER_PAGE) {
+      loadList(currentOffset + POKEMON_PER_PAGE);
+    }
   };
 
   useEffect(() => {
@@ -107,7 +151,7 @@ export default function PokemonList() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
@@ -131,7 +175,20 @@ export default function PokemonList() {
                 value={type.name}
                 className="capitalize"
               >
-                {type.name}
+                {capitalizeFirstLetter(type.name)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select onValueChange={setSelectedSpirit} defaultValue="Default">
+          <SelectTrigger className="w-full" aria-label="Filter by type">
+            <SelectValue placeholder="Filter by type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Default">Default</SelectItem>
+            {spirits.map((spirit) => (
+              <SelectItem key={spirit} value={spirit} className="capitalize">
+                {spirit}
               </SelectItem>
             ))}
           </SelectContent>
@@ -148,7 +205,7 @@ export default function PokemonList() {
         <>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             {filteredPokemon.map((p) => (
-              <PokemonCard key={p.name} pokemon={p} />
+              <PokemonCard key={p.name} pokemon={p} spirit={selectedSpirit} />
             ))}
           </div>
           {hasMore && selectedType === "all" && (
@@ -167,4 +224,10 @@ export default function PokemonList() {
       )}
     </div>
   );
+}
+
+export { POKEMON_PER_PAGE };
+
+function capitalizeFirstLetter(val: string) {
+  return String(val).charAt(0).toUpperCase() + String(val).slice(1);
 }
