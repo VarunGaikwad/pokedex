@@ -24,9 +24,10 @@ function getGenderRatio(
 export default async function PokemonDetailPage({
   params,
 }: {
-  params: { name: string };
+  params: Promise<{ name: string }>;
 }) {
-  const pokemon = await getPokemonDetails(params.name);
+  const { name } = await params;
+  const pokemon = await getPokemonDetails(name);
 
   if (!pokemon) {
     notFound();

@@ -21,8 +21,8 @@ A modern and responsive Pokedex built with **Next.js**, **Tailwind CSS**, and da
 
 ## 🛠️ Tech Stack
 
-- [Next.js](https://nextjs.org/)
-- [React](https://reactjs.org/)
+- [Next.js 16](https://nextjs.org/) (Active LTS)
+- [React 19](https://react.dev/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [PokeAPI](https://pokeapi.co/)
 - [TypeScript](https://www.typescriptlang.org/)
@@ -30,6 +30,8 @@ A modern and responsive Pokedex built with **Next.js**, **Tailwind CSS**, and da
 ---
 
 ## 📦 Installation
+
+Requires Node.js 20.9 or newer.
 
 ```bash
 git clone https://github.com/VarunGaikwad/pokedex
