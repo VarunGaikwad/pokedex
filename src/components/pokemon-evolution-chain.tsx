@@ -1,8 +1,10 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight } from 'lucide-react';
-import type { PokemonListItem } from '@/lib/pokeapi';
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowDown, ImageOff } from "lucide-react";
+import type { PokemonListItem } from "@/lib/pokeapi";
 
 interface EvolutionDetail {
   item: PokemonListItem | null;
@@ -24,96 +26,72 @@ interface EvolutionDetail {
   trade_species: PokemonListItem | null;
   turn_upside_down: boolean;
 }
-
 interface EvolutionNode {
   species: PokemonListItem;
   evolves_to: EvolutionNode[];
   evolution_details: EvolutionDetail[];
 }
+const readable = (name: string) => name.replaceAll("-", " ");
 
-interface PokemonEvolutionChainProps {
-  chain: {
-    chain: EvolutionNode;
-  } | null;
+function formatEvolutionDetails(details: EvolutionDetail): string {
+  const conditions: string[] = [];
+  if (details.trigger.name === "level-up") conditions.push(details.min_level ? `Level ${details.min_level}` : "Level up");
+  else if (details.trigger.name === "use-item") conditions.push(details.item ? `Use ${readable(details.item.name)}` : "Use item");
+  else conditions.push(readable(details.trigger.name));
+  if (details.held_item) conditions.push(`holding ${readable(details.held_item.name)}`);
+  if (details.min_happiness) conditions.push("high friendship");
+  if (details.min_affection) conditions.push("high affection");
+  if (details.min_beauty) conditions.push("high beauty");
+  if (details.time_of_day) conditions.push(`at ${details.time_of_day}`);
+  if (details.gender === 1) conditions.push("female");
+  if (details.gender === 2) conditions.push("male");
+  if (details.known_move) conditions.push(`knowing ${readable(details.known_move.name)}`);
+  if (details.known_move_type) conditions.push(`knowing a ${readable(details.known_move_type.name)} move`);
+  if (details.location) conditions.push(`at ${readable(details.location.name)}`);
+  if (details.party_species) conditions.push(`with ${readable(details.party_species.name)} in party`);
+  if (details.party_type) conditions.push(`with a ${details.party_type.name} type in party`);
+  if (details.trade_species) conditions.push(`for ${readable(details.trade_species.name)}`);
+  if (details.needs_overworld_rain) conditions.push("in rain");
+  if (details.turn_upside_down) conditions.push("turn system upside down");
+  if (details.relative_physical_stats !== null && details.relative_physical_stats !== undefined) conditions.push(`Attack ${details.relative_physical_stats === 0 ? "=" : details.relative_physical_stats > 0 ? ">" : "<"} Defense`);
+  return conditions.join(" · ");
 }
 
-function getPokemonIdFromUrl(url: string): string {
-    const parts = url.split('/');
-    return parts[parts.length - 2];
-}
-
-function EvolutionStep({ node }: { node: EvolutionNode }) {
-    const id = getPokemonIdFromUrl(node.species.url);
-    const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
-
-    return (
-        <div className="flex flex-col sm:flex-row items-center gap-2">
-            <Link href={`/pokemon/${node.species.name}`}>
-                <div className="flex flex-col items-center gap-2 p-2 rounded-md hover:bg-accent transition-colors">
-                    <div className="relative h-24 w-24">
-                       <Image src={imageUrl} alt={node.species.name} fill className="object-contain" data-ai-hint="pokemon character" />
-                    </div>
-                    <span className="capitalize font-medium text-sm">{node.species.name.replace('-', ' ')}</span>
-                </div>
-            </Link>
-
-            {node.evolves_to.length > 0 && (
-                <div className="flex flex-col gap-4">
-                    {node.evolves_to.map((nextNode, index) => (
-                        <div key={index} className="flex flex-col sm:flex-row items-center gap-2">
-                            <div className="flex flex-col items-center text-center">
-                                <ArrowRight className="h-6 w-6 text-muted-foreground rotate-90 sm:rotate-0" />
-                                <span className="text-xs text-muted-foreground max-w-24 mt-1">
-                                    {formatEvolutionDetails(nextNode.evolution_details[0])}
-                                </span>
-                            </div>
-                            <EvolutionStep node={nextNode} />
-                        </div>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-}
-
-function formatEvolutionDetails(details: EvolutionDetail | undefined): string {
-    if (!details) return 'Special';
-    if (details.trigger.name === 'level-up') {
-        if (details.min_level) return `Level ${details.min_level}`;
-        if (details.min_happiness) return `High Friendship`;
-        if (details.min_affection) return `High Affection`;
-        return 'Level Up';
-    }
-    if (details.trigger.name === 'trade') {
-        if (details.held_item) return `Trade holding ${details.held_item.name.replace('-', ' ')}`;
-        return 'Trade';
-    }
-    if (details.trigger.name === 'use-item') {
-        if (details.item) return `Use ${details.item.name.replace('-', ' ')}`;
-    }
-    return details.trigger.name.replace('-', ' ');
-}
-
-export default function PokemonEvolutionChain({ chain }: PokemonEvolutionChainProps) {
-  if (!chain) {
-    return (
-      <Card>
-        <CardHeader><CardTitle className="font-headline">Evolution Chain</CardTitle></CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">Evolution data not available for this Pokémon.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
+function EvolutionPortrait({ id, name }: { id: string; name: string }) {
+  const [failed, setFailed] = useState(0);
+  const source = failed === 0
+    ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`
+    : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
   return (
-    <Card>
-      <CardHeader><CardTitle className="font-headline">Evolution Chain</CardTitle></CardHeader>
-      <CardContent className="overflow-x-auto">
-        <div className="flex items-center gap-2 p-2">
-            <EvolutionStep node={chain.chain} />
-        </div>
-      </CardContent>
-    </Card>
+    <div className="relative h-24 w-24 shrink-0">
+      {failed < 2 ? <Image src={source} alt={readable(name)} fill sizes="96px" className={`object-contain ${failed ? "pixelated" : ""}`} onError={() => setFailed(value => value + 1)} unoptimized={failed > 0} /> : <div className="flex h-full items-center justify-center text-muted-foreground"><ImageOff className="h-7 w-7" aria-label="Artwork unavailable" /></div>}
+    </div>
+  );
+}
+
+function EvolutionStep({ node, root = false }: { node: EvolutionNode; root?: boolean }) {
+  const id = node.species.url.split("/").filter(Boolean).pop() || "0";
+  return (
+    <li className="flex min-w-0 flex-col items-center">
+      {!root && <div className="flex min-h-16 flex-col items-center justify-center gap-1 pb-3 text-center"><ArrowDown className="h-4 w-4 text-muted-foreground" aria-hidden="true" /><p className="max-w-64 text-xs leading-relaxed text-muted-foreground">{node.evolution_details.length ? Array.from(new Set(node.evolution_details.map(formatEvolutionDetails))).join(" or ") : "Special conditions"}</p></div>}
+      <Link href={`/pokemon/${node.species.name}`} className="flex w-full max-w-64 items-center gap-3 rounded-xl border border-transparent bg-secondary/40 p-3 transition-colors hover:border-border hover:bg-accent">
+        <EvolutionPortrait id={id} name={node.species.name} />
+        <div className="min-w-0"><span className="block font-mono text-xs text-muted-foreground">#{id.padStart(4, "0")}</span><span className="mt-1 block break-words text-sm font-semibold capitalize">{readable(node.species.name)}</span></div>
+      </Link>
+      {node.evolves_to.length > 0 && <ol className="mt-3 grid w-full gap-x-4 gap-y-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))" }}>{node.evolves_to.map(next => <EvolutionStep key={next.species.name} node={next} />)}</ol>}
+    </li>
+  );
+}
+
+export default function PokemonEvolutionChain({ chain }: { chain: { chain: EvolutionNode } | null }) {
+  return (
+    <div className="field-panel">
+      <p className="eyebrow mb-2">Growing into something new</p>
+      <h2 className="section-heading mb-2">Evolution</h2>
+      {!chain ? <p className="mt-4 text-sm text-muted-foreground">Evolution notes are unavailable right now. The rest of this entry is ready to explore.</p> : <>
+        <p className="mb-6 text-sm text-muted-foreground">{chain.chain.evolves_to.length ? "Follow each path to discover how this Pokémon family changes." : "This Pokémon does not evolve."}</p>
+        <ol><EvolutionStep node={chain.chain} root /></ol>
+      </>}
+    </div>
   );
 }

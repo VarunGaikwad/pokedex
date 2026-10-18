@@ -1,233 +1,246 @@
 "use client";
 
-import { useState, useEffect, useMemo, useTransition } from "react";
-import type { PokemonListItem } from "@/lib/pokeapi";
-import { getPokemonList, getTypes } from "@/lib/pokeapi";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, ArrowRight, BookOpen, RotateCcw, Search, SlidersHorizontal, X } from "lucide-react";
+import { getGenerationMembership, getGenerations, getPokemonCatalog, getPokemonPageMetadata, getTypeMembership, type PokemonListItem, type PokemonSummary } from "@/lib/pokeapi";
+import { DEFAULT_DISCOVERY, STANDARD_TYPES, POKEMON_PER_PAGE, discoveryParams, displayPokemonName, filterCatalog, paginate, parseDiscoveryParams, pokemonIdFromUrl, type CatalogPokemon, type DiscoveryState, type InitialDiscovery } from "@/lib/pokemon-discovery";
 import PokemonCard, { PokemonCardSkeleton } from "@/components/pokemon-card";
+import { ArtworkControls } from "@/components/sprite-switcher";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Search } from "lucide-react";
-import { SpriteSwitcher } from "./sprite-switcher";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
-const POKEMON_PER_PAGE = 20;
+export { POKEMON_PER_PAGE };
+const gridClass = "grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5";
+interface Membership {
+  key: string;
+  typeIds?: ReadonlySet<number>;
+  generationIds?: ReadonlySet<number>;
+  error?: string;
+}
 
-const fetchPokemonByType = async (type: string) => {
-  const response = await fetch(`https://pokeapi.co/api/v2/type/${type}`);
-  if (!response.ok) return [];
-  const data = await response.json();
-  return data.pokemon.map((p: { pokemon: PokemonListItem }) => p.pokemon);
-};
-
-export default function PokemonList() {
-  const [pokemon, setPokemon] = useState<PokemonListItem[]>([]);
-  const [types, setTypes] = useState<PokemonListItem[]>([]);
-  const spirits: string[] = [
-    // Front Views
-    "Shiny",
-
-    // Dream World
-    "Dream World",
-
-    // Home
-    "Home",
-    "Home Shiny",
-
-    // Official Artwork
-    "Official Artwork",
-    "Official Artwork Shiny",
-
-    // Showdown Front
-    "Showdown",
-    "Showdown Shiny",
-
-    // Back Views
-    "Back",
-    "Back Shiny",
-
-    // Showdown Back
-    "Showdown Back",
-    "Showdown Back Shiny",
-  ];
-  const [selectedSpirit, setSelectedSpirit] = useState("Default");
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-  const [offset, setOffset] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState("all");
-  const [isPending, startTransition] = useTransition();
-
-  const loadInitialList = async (currentOffset = 0) => {
-    setIsLoading(true);
-    const listResponse = await getPokemonList(POKEMON_PER_PAGE, currentOffset);
-    setPokemon(
-      currentOffset === 0
-        ? listResponse.results
-        : (prev) => [...prev, ...listResponse.results]
-    );
-    setOffset(currentOffset + POKEMON_PER_PAGE);
-    loadList(currentOffset + POKEMON_PER_PAGE);
-    setHasMore(!!listResponse.next);
-    setIsLoading(false);
-  };
-
-  const loadList = async (currentOffset = 0) => {
-    const listResponse = await getPokemonList(POKEMON_PER_PAGE, currentOffset);
-    setPokemon(
-      currentOffset === 0
-        ? listResponse.results
-        : (prev) => [...prev, ...listResponse.results]
-    );
-    setOffset(currentOffset + POKEMON_PER_PAGE);
-    setHasMore(!!listResponse.next);
-    if (listResponse.results.length === POKEMON_PER_PAGE) {
-      loadList(currentOffset + POKEMON_PER_PAGE);
-    }
-  };
+export default function PokemonList({ initial }: { initial?: InitialDiscovery }) {
+  const initialMembership = useMemo<Membership | null>(() => initial?.membership ? {
+    key: initial.membership.key,
+    typeIds: initial.membership.typeIds ? new Set(initial.membership.typeIds) : undefined,
+    generationIds: initial.membership.generationIds ? new Set(initial.membership.generationIds) : undefined,
+  } : null, [initial]);
+  const [state, setState] = useState<DiscoveryState>(initial?.state ?? DEFAULT_DISCOVERY);
+  const stateRef = useRef(state);
+  const [ready, setReady] = useState(!!initial);
+  const [catalog, setCatalog] = useState<CatalogPokemon[] | null>(initial?.catalog ?? null);
+  const [generations, setGenerations] = useState<PokemonListItem[]>(initial?.generations ?? []);
+  const [indexError, setIndexError] = useState("");
+  const [membership, setMembership] = useState<Membership | null>(initialMembership);
+  const [metadata, setMetadata] = useState<{ key: string; items: PokemonSummary[]; error?: string } | null>(null);
+  const [indexRetry, setIndexRetry] = useState(0);
+  const [filterRetry, setFilterRetry] = useState(0);
+  const [metadataRetry, setMetadataRetry] = useState(0);
+  const restoredScroll = useRef(false);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const loadInitialData = async () => {
-      setIsLoading(true);
-      const typesResponse = await getTypes();
-      setTypes(typesResponse);
-      await loadInitialList(0);
-      setIsLoading(false);
+    const readLocation = () => {
+      const next = parseDiscoveryParams(new URLSearchParams(window.location.search));
+      stateRef.current = next;
+      setState(next);
     };
-    loadInitialData();
+    readLocation();
+    setReady(true);
+    window.addEventListener("popstate", readLocation);
+    return () => window.removeEventListener("popstate", readLocation);
+  }, []);
+
+  const update = useCallback((patch: Partial<DiscoveryState>, replace = false) => {
+    const next = { ...stateRef.current, ...patch };
+    stateRef.current = next;
+    setState(next);
+    const query = discoveryParams(next);
+    const url = `${window.location.pathname}${query ? `?${query}` : ""}`;
+    if (url !== `${window.location.pathname}${window.location.search}`) {
+      window.history[replace ? "replaceState" : "pushState"](null, "", url);
+    }
   }, []);
 
   useEffect(() => {
-    const handleTypeChange = async () => {
-      if (selectedType === "all") {
-        if (
-          pokemon.length === 0 ||
-          !pokemon.some((p) => p.url.includes("pokemon/1/"))
-        ) {
-          loadInitialList(0);
-        }
-      } else {
-        setIsLoading(true);
-        const pokemonFromType = await fetchPokemonByType(selectedType);
-        setPokemon(pokemonFromType);
-        setHasMore(false);
-        setIsLoading(false);
-      }
-    };
-    if (!isLoading) {
-      handleTypeChange();
+    if (initial?.catalog && indexRetry === 0) return;
+    let current = true;
+    setIndexError("");
+    Promise.all([getPokemonCatalog(), getGenerations()]).then(([entries, generationList]) => {
+      if (!current) return;
+      setCatalog(entries);
+      setGenerations(generationList);
+    }).catch(() => { if (current) setIndexError("We couldn’t open the field guide. Check your connection and try again."); });
+    return () => { current = false; };
+  }, [initial, indexRetry]);
+
+  const filterKey = `${state.type}:${state.generation}`;
+  useEffect(() => {
+    if (!ready) return;
+    if (initialMembership?.key === filterKey && filterRetry === 0) {
+      setMembership(initialMembership);
+      return;
     }
-  }, [selectedType]);
-
-  const loadMorePokemon = async () => {
-    if (!hasMore || isLoadingMore || selectedType !== "all") return;
-    setIsLoadingMore(true);
-    const listResponse = await getPokemonList(POKEMON_PER_PAGE, offset);
-    setPokemon((prev) => [...prev, ...listResponse.results]);
-    setOffset((prev) => prev + POKEMON_PER_PAGE);
-    setHasMore(!!listResponse.next);
-    setIsLoadingMore(false);
-  };
-
-  const filteredPokemon = useMemo(() => {
-    return pokemon.filter((p) =>
-      p.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [searchTerm, pokemon]);
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    startTransition(() => {
-      setSearchTerm(e.target.value);
+    let current = true;
+    Promise.all([
+      state.type === "all" ? Promise.resolve(undefined) : getTypeMembership(state.type),
+      state.generation === "all" ? Promise.resolve(undefined) : getGenerationMembership(state.generation),
+    ]).then(([typeIds, generationIds]) => {
+      if (current) setMembership({ key: filterKey, typeIds, generationIds });
+    }).catch(() => {
+      if (current) setMembership({ key: filterKey, error: "These filters couldn’t be loaded. Please try again." });
     });
+    return () => { current = false; };
+  }, [ready, filterKey, state.type, state.generation, filterRetry, initialMembership]);
+
+  const filtersReady = ready && !!catalog && membership?.key === filterKey && !membership.error;
+  const filtered = useMemo(() => filtersReady && catalog ? filterCatalog(catalog, { q: state.q, type: state.type, generation: state.generation, sort: state.sort }, membership?.typeIds, membership?.generationIds) : [], [filtersReady, catalog, state.q, state.type, state.generation, state.sort, membership]);
+  const page = useMemo(() => paginate(filtered, state.page), [filtered, state.page]);
+  const pageKey = filtersReady ? page.items.map((pokemon) => pokemon.id).join(",") : null;
+
+  useEffect(() => {
+    if (filtersReady && page.page !== state.page) update({ page: page.page }, true);
+  }, [filtersReady, page.page, state.page, update]);
+
+  useEffect(() => {
+    if (pageKey === null) return;
+    const controller = new AbortController();
+    getPokemonPageMetadata(page.items, controller.signal).then((items) => {
+      if (!controller.signal.aborted) setMetadata({ key: pageKey, items });
+    }).catch(() => {
+      if (!controller.signal.aborted) setMetadata({ key: pageKey, items: [], error: "The Pokémon on this page couldn’t be loaded. Your filters are saved." });
+    });
+    return () => controller.abort();
+  }, [pageKey, page.items, metadataRetry]);
+
+  const filterError = membership?.key === filterKey ? membership.error : undefined;
+  const metadataError = metadata?.key === pageKey ? metadata.error : undefined;
+  const error = indexError || filterError || metadataError;
+  const loading = !error && !filtersReady;
+  const visibleMetadata = metadata?.key === pageKey ? new Map(metadata.items.map((pokemon) => [pokemon.id, pokemon])) : new Map<number, PokemonSummary>();
+
+  useEffect(() => {
+    if (loading || error || restoredScroll.current || !metadata || metadata.key !== pageKey) return;
+    let frame = 0;
+    try {
+      const savedUrl = sessionStorage.getItem("pokedex:return-url");
+      const savedY = sessionStorage.getItem("pokedex:scroll-y");
+      if (savedUrl === `${window.location.pathname}${window.location.search}` && savedY !== null) {
+        const y = Number(savedY);
+        if (Number.isFinite(y) && y >= 0) {
+          frame = requestAnimationFrame(() => {
+            window.scrollTo({ top: y, behavior: "instant" });
+            sessionStorage.removeItem("pokedex:scroll-y");
+            restoredScroll.current = true;
+          });
+        }
+      } else restoredScroll.current = true;
+    } catch { restoredScroll.current = true; }
+    return () => cancelAnimationFrame(frame);
+  }, [loading, error, metadata, pageKey]);
+
+  const clearFilters = () => update({ q: "", type: "all", generation: "all", page: 1 });
+  const activeFilters = [
+    ...(state.q ? [{ label: `“${state.q}”`, clear: () => update({ q: "", page: 1 }) }] : []),
+    ...(state.type !== "all" ? [{ label: displayPokemonName(state.type), clear: () => update({ type: "all", page: 1 }) }] : []),
+    ...(state.generation !== "all" ? [{ label: `Generation ${state.generation}`, clear: () => update({ generation: "all", page: 1 }) }] : []),
+  ];
+
+  const filterControls = (
+    <>
+      <FilterSelect label="Type" value={state.type} onChange={(type) => update({ type, page: 1 })}>
+        <SelectItem value="all">All types</SelectItem>
+        {STANDARD_TYPES.map((type) => <SelectItem key={type} value={type}>{displayPokemonName(type)}</SelectItem>)}
+      </FilterSelect>
+      <FilterSelect label="Generation" value={state.generation} onChange={(generation) => update({ generation, page: 1 })}>
+        <SelectItem value="all">All generations</SelectItem>
+        {generations.map((generation) => {
+          const id = pokemonIdFromUrl(generation.url);
+          return <SelectItem key={id} value={String(id)}>Generation {id}</SelectItem>;
+        })}
+      </FilterSelect>
+      <FilterSelect label="Sort by" value={state.sort} onChange={(sort) => update({ sort: sort as DiscoveryState["sort"], page: 1 })}>
+        <SelectItem value="number">Number: lowest first</SelectItem>
+        <SelectItem value="number-desc">Number: highest first</SelectItem>
+        <SelectItem value="name">Name: A–Z</SelectItem>
+        <SelectItem value="name-desc">Name: Z–A</SelectItem>
+      </FilterSelect>
+    </>
+  );
+
+  const changePage = (next: number) => {
+    update({ page: next });
+    resultsRef.current?.scrollIntoView({ behavior: "instant", block: "start" });
   };
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search Pokémon..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="pl-10"
-            aria-label="Search Pokémon by name"
-          />
+    <section className="space-y-6" aria-label="Pokémon field guide">
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
+        <div className="flex items-end gap-3">
+          <div className="min-w-0 flex-1 space-y-1.5">
+            <label htmlFor="pokemon-search" className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Find your Pokémon</label>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+              <Input id="pokemon-search" type="search" placeholder="Name or number, e.g. Pikachu or #0025" value={state.q} maxLength={100} onChange={(event) => update({ q: event.target.value, page: 1 }, true)} className="h-11 bg-background pl-10 text-sm" />
+            </div>
+          </div>
+          <Sheet>
+            <SheetTrigger asChild><Button variant="outline" className="h-11 gap-2 md:hidden"><SlidersHorizontal className="h-4 w-4" aria-hidden="true" />Filters{activeFilters.length > 0 && <span className="rounded-full bg-primary px-1.5 text-xs text-primary-foreground">{activeFilters.length}</span>}</Button></SheetTrigger>
+            <SheetContent className="flex w-[min(90vw,380px)] flex-col overflow-y-auto">
+              <SheetHeader><SheetTitle>Refine your field guide</SheetTitle><SheetDescription>Combine type, generation, and search to find a Pokémon.</SheetDescription></SheetHeader>
+              <div className="mt-4 space-y-5">{filterControls}<ArtworkControls artwork={state.artwork} shiny={state.shiny} onArtworkChange={(artwork) => update({ artwork })} onShinyChange={(shiny) => update({ shiny })} /></div>
+              <Button variant="outline" onClick={clearFilters} className="mt-4">Clear filters</Button>
+              <SheetClose asChild><Button className="text-primary-foreground">Show results</Button></SheetClose>
+            </SheetContent>
+          </Sheet>
         </div>
-        <Select onValueChange={setSelectedType} defaultValue="all">
-          <SelectTrigger className="w-full" aria-label="Filter by type">
-            <SelectValue placeholder="Filter by type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            {types.map((type) => (
-              <SelectItem
-                key={type.name}
-                value={type.name}
-                className="capitalize"
-              >
-                {capitalizeFirstLetter(type.name)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select onValueChange={setSelectedSpirit} defaultValue="Default">
-          <SelectTrigger className="w-full" aria-label="Filter by type">
-            <SelectValue placeholder="Filter by type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Default">Default</SelectItem>
-            {spirits.map((spirit) => (
-              <SelectItem key={spirit} value={spirit} className="capitalize">
-                {spirit}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="mt-4 hidden grid-cols-3 gap-4 md:grid">{filterControls}</div>
+        <div className="mt-4 hidden items-end justify-between gap-6 border-t border-border pt-4 md:flex">
+          <p className="max-w-sm text-xs leading-relaxed text-muted-foreground">A national-dex field guide. One entry per species, ready to discover by name or number.</p>
+          <ArtworkControls artwork={state.artwork} shiny={state.shiny} onArtworkChange={(artwork) => update({ artwork })} onShinyChange={(shiny) => update({ shiny })} />
+        </div>
       </div>
 
-      {isLoading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-          {Array.from({ length: POKEMON_PER_PAGE }).map((_, i) => (
-            <PokemonCardSkeleton key={i} />
-          ))}
+      <div ref={resultsRef} className="scroll-mt-6 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-muted-foreground" role="status" aria-live="polite">
+            {filtersReady ? <><strong className="font-semibold tabular-nums text-foreground">{filtered.length.toLocaleString()}</strong> Pokémon{filtered.length > 0 && <span className="ml-2 text-xs">· {page.start + 1}–{Math.min(page.start + POKEMON_PER_PAGE, filtered.length)} of {filtered.length.toLocaleString()}</span>}</> : "Opening the field guide…"}
+          </p>
+          {activeFilters.length > 0 && <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 gap-1.5 text-xs"><RotateCcw className="h-3 w-3" aria-hidden="true" />Clear filters</Button>}
         </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-            {filteredPokemon.map((p) => (
-              <PokemonCard key={p.name} pokemon={p} spirit={selectedSpirit} />
-            ))}
+        {activeFilters.length > 0 && <div className="flex flex-wrap gap-2" aria-label="Active filters">{activeFilters.map((filter) => <button key={filter.label} onClick={filter.clear} aria-label={`Remove filter ${filter.label}`} className="inline-flex max-w-full items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><span className="truncate">{filter.label}</span><X className="h-3 w-3 shrink-0" aria-hidden="true" /></button>)}</div>}
+
+        {error ? (
+          <div className="rounded-2xl border border-border bg-card px-6 py-16 text-center" role="alert">
+            <BookOpen className="mx-auto mb-4 h-8 w-8 text-muted-foreground" aria-hidden="true" />
+            <h2 className="text-xl font-semibold">A little trouble in the field</h2><p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">{error}</p>
+            <Button className="mt-6 gap-2" onClick={() => {
+              if (indexError) setIndexRetry((value) => value + 1);
+              else if (filterError) { setMembership(null); setFilterRetry((value) => value + 1); }
+              else { setMetadata(null); setMetadataRetry((value) => value + 1); }
+            }}><RotateCcw className="h-4 w-4" aria-hidden="true" />Try again</Button>
           </div>
-          {hasMore && selectedType === "all" && (
-            <div className="flex justify-center mt-8">
-              <Button onClick={loadMorePokemon} disabled={isLoadingMore}>
-                {isLoadingMore ? "Loading..." : "Load More"}
-              </Button>
-            </div>
-          )}
-          {filteredPokemon.length === 0 && !isLoading && (
-            <div className="text-center col-span-full py-12">
-              <p className="text-muted-foreground">No Pokémon found.</p>
-            </div>
-          )}
-        </>
-      )}
-    </div>
+        ) : loading ? (
+          <div className={gridClass} aria-label="Loading Pokémon" aria-busy="true">{Array.from({ length: filtersReady ? page.items.length : POKEMON_PER_PAGE }, (_, index) => <PokemonCardSkeleton key={index} />)}</div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-border px-6 py-20 text-center">
+            <Search className="mx-auto mb-4 h-8 w-8 text-muted-foreground" aria-hidden="true" /><h2 className="text-xl font-semibold">No discoveries just yet</h2><p className="mt-2 text-sm text-muted-foreground">Try another name or number, or give your filters a little more room.</p><Button onClick={clearFilters} className="mt-6">Clear filters</Button>
+          </div>
+        ) : (
+          <div className={gridClass}>{page.items.map((pokemon, index) => <PokemonCard key={pokemon.id} pokemon={visibleMetadata.get(pokemon.id) || { ...pokemon, types: [] }} artwork={state.artwork} shiny={state.shiny} priority={page.page === 1 && index < 3} />)}</div>
+        )}
+
+        {filtersReady && !error && filtered.length > 0 && <nav className="flex items-center justify-between gap-3 border-t border-border pt-6" aria-label="Pokémon pages">
+          <Button variant="outline" onClick={() => changePage(page.page - 1)} disabled={page.page === 1} className="gap-2"><ArrowLeft className="h-4 w-4" aria-hidden="true" /><span>Previous</span></Button>
+          <span className="text-xs tabular-nums text-muted-foreground sm:text-sm">Page <strong className="font-medium text-foreground">{page.page}</strong> of {page.totalPages}</span>
+          <Button variant="outline" onClick={() => changePage(page.page + 1)} disabled={page.page === page.totalPages} className="gap-2"><span>Next</span><ArrowRight className="h-4 w-4" aria-hidden="true" /></Button>
+        </nav>}
+      </div>
+    </section>
   );
 }
 
-export { POKEMON_PER_PAGE };
-
-function capitalizeFirstLetter(val: string) {
-  return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+function FilterSelect({ label, value, onChange, children }: { label: string; value: string; onChange: (value: string) => void; children: React.ReactNode }) {
+  return <div className="space-y-1.5"><span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{label}</span><Select value={value} onValueChange={onChange}><SelectTrigger aria-label={label} className="bg-background"><SelectValue /></SelectTrigger><SelectContent>{children}</SelectContent></Select></div>;
 }

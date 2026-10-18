@@ -1,123 +1,61 @@
-'use server';
+import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { CategorizeMovesOutput } from "@/ai/flows/categorize-moves";
+import { getCategorizedMoves } from "@/app/actions";
+import TypeBadge from "./type-badge";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import type { CategorizeMovesOutput } from '@/ai/flows/categorize-moves';
-import { getCategorizedMoves } from '@/app/actions';
-import TypeBadge from './type-badge';
+interface PokemonMovesProps { pokemonName: string; moves: any[] }
+const learnMethods = ["level-up", "machine", "egg", "tutor"] as const;
+const methodNames = { "level-up": "Level up", machine: "TM / TR", egg: "Egg", tutor: "Tutor" };
 
-interface PokemonMovesProps {
-  pokemonName: string;
-  moves: any[];
+function MovesTable({ moves, hasLevel }: { moves: CategorizeMovesOutput[keyof CategorizeMovesOutput]; hasLevel: boolean }) {
+  if (!moves?.length) return <p className="p-4 text-sm text-muted-foreground">No moves in this category.</p>;
+  return (
+    <div className="max-h-[520px] w-full overflow-auto rounded-xl border focus-visible:outline-offset-2" role="region" aria-label="Move details, scroll to see all columns and rows" tabIndex={0}>
+      <table className="w-full min-w-[560px] caption-bottom text-sm">
+        <caption className="sr-only">Learnable moves with type, category, power, and accuracy</caption>
+        <TableHeader className="sticky top-0 z-10 bg-card">
+          <TableRow>
+            {hasLevel && <TableHead scope="col" className="w-14">Lv.</TableHead>}
+            <TableHead scope="col">Move</TableHead><TableHead scope="col">Type</TableHead><TableHead scope="col">Category</TableHead>
+            <TableHead scope="col" className="text-right">Power</TableHead><TableHead scope="col" className="text-right">Acc.</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {moves.map(move => <TableRow key={move.name}>
+            {hasLevel && <TableCell className="font-medium tabular-nums">{move.level ?? "—"}</TableCell>}
+            <TableCell className="whitespace-nowrap font-medium capitalize">{move.name.replaceAll("-", " ")}</TableCell>
+            <TableCell><TypeBadge typeName={move.type} /></TableCell>
+            <TableCell className="capitalize">{move.category}</TableCell>
+            <TableCell className="text-right tabular-nums">{move.power ?? "—"}</TableCell>
+            <TableCell className="text-right tabular-nums">{move.accuracy == null ? "—" : `${move.accuracy}%`}</TableCell>
+          </TableRow>)}
+        </TableBody>
+      </table>
+    </div>
+  );
 }
 
-const MovesTable = ({ moves, hasLevel }: { moves: CategorizeMovesOutput[keyof CategorizeMovesOutput], hasLevel: boolean }) => {
-    if (!moves || moves.length === 0) {
-        return <p className="text-muted-foreground p-4 text-center">No moves in this category.</p>
-    }
-
-    return (
-        <div className="w-full overflow-auto rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  {hasLevel && <TableHead className="w-[50px] font-bold">Lv.</TableHead>}
-                  <TableHead className="font-bold">Move</TableHead>
-                  <TableHead className="font-bold">Type</TableHead>
-                  <TableHead className="font-bold">Cat.</TableHead>
-                  <TableHead className="text-right font-bold">Power</TableHead>
-                  <TableHead className="text-right font-bold">Acc.</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {moves.map((move) => (
-                  <TableRow key={move.name}>
-                    {hasLevel && <TableCell className="font-medium">{move.level}</TableCell>}
-                    <TableCell className="capitalize font-medium">{move.name.replace('-', ' ')}</TableCell>
-                    <TableCell><TypeBadge typeName={move.type} /></TableCell>
-                    <TableCell className="capitalize">{move.category}</TableCell>
-                    <TableCell className="text-right font-mono">{move.power ?? '—'}</TableCell>
-                    <TableCell className="text-right font-mono">{move.accuracy ?? '—'}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-        </div>
-    );
-};
-
-
 export default async function PokemonMoves({ pokemonName, moves }: PokemonMovesProps) {
-  const categorizedMovesResult = await getCategorizedMoves({ pokemonName, moves });
-
-  const renderCategorizedMoves = () => {
-    if ('error' in categorizedMovesResult || !categorizedMovesResult || Object.keys(categorizedMovesResult).length === 0) {
-      return (
-         <div className="text-center text-muted-foreground">
-            <p>Could not load move details.</p>
-          </div>
-      );
-    }
-    
-    const categorizedMoves: CategorizeMovesOutput = categorizedMovesResult;
-    const learnMethods = ['level-up', 'machine', 'egg', 'tutor'];
-    
-    const defaultTab = learnMethods.find(method => categorizedMoves[method as keyof typeof categorizedMoves]?.length);
-
-    if (!defaultTab) {
-        return (
-            <div className="text-center text-muted-foreground">
-                <p>This Pokémon has no learnable moves to display.</p>
-            </div>
-        );
-    }
-
-    return (
-        <Tabs defaultValue={defaultTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-4">
-                {learnMethods.map(method => {
-                    const moveList = categorizedMoves[method as keyof typeof categorizedMoves];
-                    const count = moveList?.length ?? 0;
-                    return (
-                        <TabsTrigger key={method} value={method} disabled={count === 0} className="capitalize">
-                            {method.replace('-', ' ')} ({count})
-                        </TabsTrigger>
-                    );
-                })}
-            </TabsList>
-            {learnMethods.map(method => {
-                 const moveList = categorizedMoves[method as keyof typeof categorizedMoves];
-                 return (
-                    <TabsContent key={method} value={method} className="mt-0">
-                        <MovesTable moves={moveList} hasLevel={method === 'level-up'} />
-                    </TabsContent>
-                 );
-            })}
-        </Tabs>
-    );
-  };
+  let result: Awaited<ReturnType<typeof getCategorizedMoves>> | null = null;
+  try { result = await getCategorizedMoves({ pokemonName, moves }); } catch { /* A failed move lookup must not hide the entry. */ }
+  const categorized = result && !("error" in result) ? result : null;
+  const defaultTab = learnMethods.find(method => categorized?.[method]?.length);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="font-headline">Learnable Moves</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {renderCategorizedMoves()}
-      </CardContent>
-    </Card>
+    <div className="field-panel">
+      <p className="eyebrow mb-2">A few tricks up its sleeve</p>
+      <h2 className="section-heading mb-2">Learnable moves</h2>
+      <p className="mb-5 text-sm text-muted-foreground">Explore moves by how they’re learned. Availability can vary between games.</p>
+      {!categorized ? <p className="text-sm text-muted-foreground">Move details couldn’t be loaded right now. Try this entry again in a moment.</p> : !defaultTab ? <p className="text-sm text-muted-foreground">This Pokémon has no learnable moves to display.</p> : (
+        <Tabs defaultValue={defaultTab} className="min-w-0 w-full">
+          <TabsList className="mb-4 grid h-auto w-full grid-cols-2 gap-1 p-1 sm:grid-cols-4" aria-label="Move learning methods">
+            {learnMethods.map(method => <TabsTrigger key={method} value={method} disabled={!categorized[method]?.length} className="min-h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">{methodNames[method]} <span className="ml-1.5 text-xs">{categorized[method]?.length ?? 0}</span></TabsTrigger>)}
+          </TabsList>
+          <p className="mb-3 text-xs text-muted-foreground sm:hidden">Swipe the table sideways to see every detail.</p>
+          {learnMethods.map(method => <TabsContent key={method} value={method} className="min-w-0"><MovesTable moves={categorized[method]} hasLevel={method === "level-up"} /></TabsContent>)}
+        </Tabs>
+      )}
+    </div>
   );
 }

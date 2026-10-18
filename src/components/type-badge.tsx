@@ -1,37 +1,35 @@
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 
 interface TypeBadgeProps {
   typeName: string;
   className?: string;
 }
 
-const typeColors: { [key: string]: string } = {
-  normal: "bg-gray-400 text-white hover:bg-gray-400/90",
-  fire: "bg-orange-500 text-white hover:bg-orange-500/90",
-  water: "bg-blue-500 text-white hover:bg-blue-500/90",
-  electric: "bg-yellow-400 text-black hover:bg-yellow-400/90",
-  grass: "bg-green-500 text-white hover:bg-green-500/90",
-  ice: "bg-cyan-300 text-black hover:bg-cyan-300/90",
-  fighting: "bg-red-700 text-white hover:bg-red-700/90",
-  poison: "bg-purple-600 text-white hover:bg-purple-600/90",
-  ground: "bg-yellow-600 text-white hover:bg-yellow-600/90",
-  flying: "bg-indigo-400 text-white hover:bg-indigo-400/90",
-  psychic: "bg-pink-500 text-white hover:bg-pink-500/90",
-  bug: "bg-lime-500 text-black hover:bg-lime-500/90",
-  rock: "bg-stone-500 text-white hover:bg-stone-500/90",
-  ghost: "bg-indigo-800 text-white hover:bg-indigo-800/90",
-  dragon: "bg-indigo-600 text-white hover:bg-indigo-600/90",
-  dark: "bg-gray-800 text-white hover:bg-gray-800/90",
-  steel: "bg-slate-400 text-black hover:bg-slate-400/90",
-  fairy: "bg-pink-300 text-black hover:bg-pink-300/90",
+const typeColors: Record<string, string> = {
+  normal: "bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-200",
+  fire: "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-200",
+  water: "bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-200",
+  electric: "bg-yellow-100 text-yellow-900 dark:bg-yellow-950 dark:text-yellow-200",
+  grass: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200",
+  ice: "bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-200",
+  fighting: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200",
+  poison: "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-200",
+  ground: "bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200",
+  flying: "bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-200",
+  psychic: "bg-pink-100 text-pink-800 dark:bg-pink-950 dark:text-pink-200",
+  bug: "bg-lime-100 text-lime-900 dark:bg-lime-950 dark:text-lime-200",
+  rock: "bg-stone-200 text-stone-800 dark:bg-stone-800 dark:text-stone-200",
+  ghost: "bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-200",
+  dragon: "bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-200",
+  dark: "bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200",
+  steel: "bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-200",
+  fairy: "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-200",
 };
 
 export default function TypeBadge({ typeName, className }: TypeBadgeProps) {
-  const colorClass = typeColors[typeName] || "bg-gray-500 text-white";
   return (
-    <Badge className={cn("capitalize text-base border-none", colorClass, className)}>
+    <span className={cn("inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold capitalize leading-5", typeColors[typeName] || "bg-muted text-muted-foreground", className)}>
       {typeName}
-    </Badge>
+    </span>
   );
 }

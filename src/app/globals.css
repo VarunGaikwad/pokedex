@@ -4,91 +4,86 @@
 
 @layer base {
   :root {
-    /* Light Theme */
-    --background: 0 0% 98%;
-    --foreground: 240 5% 10%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 240 5% 10%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 5% 10%;
-
-    --primary: 220 90% 56%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 160 60% 40%;
-    --secondary-foreground: 0 0% 100%;
-
-    --muted: 240 20% 95%;
-    --muted-foreground: 240 5% 40%;
-
-    --accent: 280 70% 60%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 72% 51%;
+    --background: 44 43% 96%;
+    --foreground: 210 13% 14%;
+    --card: 45 50% 99%;
+    --card-foreground: 210 13% 14%;
+    --popover: 45 50% 99%;
+    --popover-foreground: 210 13% 14%;
+    --primary: 49 100% 55%;
+    --primary-foreground: 210 20% 10%;
+    --secondary: 42 24% 90%;
+    --secondary-foreground: 210 13% 20%;
+    --muted: 42 24% 91%;
+    --muted-foreground: 210 8% 40%;
+    --accent: 48 80% 88%;
+    --accent-foreground: 210 20% 12%;
+    --destructive: 0 72% 40%;
     --destructive-foreground: 0 0% 100%;
-
-    --border: 240 6% 90%;
-    --input: 240 6% 92%;
-    --ring: 220 90% 56%;
-
-    --radius: 0.5rem;
+    --border: 40 20% 83%;
+    --input: 40 20% 78%;
+    --ring: 210 13% 25%;
+    --radius: 1rem;
+    --chart-1: 49 95% 45%;
+    --chart-2: 155 35% 40%;
+    --chart-3: 25 65% 50%;
+    --chart-4: 260 35% 55%;
+    --chart-5: 340 45% 50%;
   }
 
   .dark {
-    /* Dark Theme */
-    --background: 240 10% 8%;
-    --foreground: 0 0% 98%;
-
-    --card: 240 10% 12%;
-    --card-foreground: 0 0% 98%;
-
-    --popover: 240 10% 8%;
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 220 90% 66%;
-    --primary-foreground: 0 0% 0%;
-
-    --secondary: 160 60% 45%;
-    --secondary-foreground: 0 0% 0%;
-
-    --muted: 240 5% 20%;
-    --muted-foreground: 0 0% 70%;
-
-    --accent: 280 70% 70%;
-    --accent-foreground: 0 0% 0%;
-
-    --destructive: 0 62.8% 45%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 240 4% 25%;
-    --input: 240 4% 25%;
-    --ring: 220 90% 66%;
-
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --background: 210 13% 9%;
+    --foreground: 43 25% 93%;
+    --card: 210 12% 13%;
+    --card-foreground: 43 25% 93%;
+    --popover: 210 12% 13%;
+    --popover-foreground: 43 25% 93%;
+    --primary: 49 100% 58%;
+    --primary-foreground: 210 20% 10%;
+    --secondary: 210 10% 21%;
+    --secondary-foreground: 43 25% 93%;
+    --muted: 210 10% 19%;
+    --muted-foreground: 40 9% 68%;
+    --accent: 48 22% 23%;
+    --accent-foreground: 48 90% 80%;
+    --destructive: 0 85% 72%;
+    --destructive-foreground: 210 20% 10%;
+    --border: 210 8% 26%;
+    --input: 210 8% 32%;
+    --ring: 49 100% 58%;
   }
+
+  * { @apply border-border; }
+  html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+  body { @apply bg-background text-foreground; }
+  ::selection { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
+  :focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 4px; }
+  main { min-width: 0; }
+  h1, h2, h3 { text-wrap: balance; }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-    background-image: radial-gradient(hsl(var(--border)) 1px, transparent 1px);
-    background-size: 1.5rem 1.5rem;
-  }
+@layer components {
+  .field-container { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10; }
+  .eyebrow { @apply text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground; }
+  .field-panel { @apply min-w-0 rounded-2xl border bg-card p-5 sm:p-7; }
+  .section-heading { @apply text-xl font-bold tracking-tight sm:text-2xl; }
+  .skip-link { @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-3 focus:font-bold focus:text-primary-foreground; }
 }
 
 @layer utilities {
-  .pixelated {
-    image-rendering: pixelated;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: crisp-edges;
+  .pixelated { image-rendering: pixelated; }
+  .artwork-grid {
+    background-image: linear-gradient(hsl(var(--border) / .3) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border) / .3) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

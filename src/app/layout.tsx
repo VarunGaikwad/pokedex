@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import SiteHeader from "@/components/site-header";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 
 export const metadata: Metadata = {
   title: "Pokédex",
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: "/images/logo.png",
+    shortcut: "/images/logo.png",
+    apple: "/images/logo.png",
   },
   keywords: [
     "Pokédex",
@@ -27,7 +31,7 @@ export const metadata: Metadata = {
     },
   ],
   description:
-    "A modern Pokédex to browse, search, and manage your favorite Pokémon.",
+    "Your Pokémon field guide. Discover Pokémon, explore their stories, and find your next favorite.",
 };
 
 export default function RootLayout({
@@ -36,21 +40,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap"
-          rel="stylesheet"
-        />
+        <link rel="preconnect" href="https://pokeapi.co" crossOrigin="anonymous" />
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('pokedex:theme');var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light'}catch(e){try{var d=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light'}catch(e){}}})();` }} />
       </head>
-      <body className="font-body antialiased">
-        <div className="bg-background/95 backdrop-blur-sm min-h-screen">
+      <body className={`${inter.variable} font-body antialiased`}>
+        <a href="#main-content" className="skip-link">Skip to content</a>
+        <div className="min-h-screen">
+          <SiteHeader />
           {children}
         </div>
         <Toaster />

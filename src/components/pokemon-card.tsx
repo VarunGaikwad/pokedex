@@ -1,115 +1,95 @@
 "use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Card, CardContent } from "@/components/ui/card";
+import { ImageOff } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { PokemonListItem } from "@/lib/pokeapi";
-import { POKEMON_PER_PAGE } from "./pokemon-list";
+import TypeBadge from "@/components/type-badge";
+import type { PokemonSummary } from "@/lib/pokeapi";
+import { displayPokemonName, spriteUrl, type ArtworkStyle } from "@/lib/pokemon-discovery";
+import { cn } from "@/lib/utils";
 
 interface PokemonCardProps {
-  pokemon: PokemonListItem;
-  spirit: string;
+  pokemon: PokemonSummary;
+  artwork: ArtworkStyle;
+  shiny: boolean;
+  priority?: boolean;
 }
 
-function getPokemonId(url: string): string {
-  const parts = url.split("/");
-  return parts[parts.length - 2];
+const typeTints: Record<string, string> = {
+  normal: "bg-stone-100/70 dark:bg-stone-500/10", fire: "bg-orange-100/60 dark:bg-orange-500/10",
+  water: "bg-sky-100/60 dark:bg-sky-500/10", electric: "bg-yellow-100/70 dark:bg-yellow-500/10",
+  grass: "bg-lime-100/60 dark:bg-lime-500/10", ice: "bg-cyan-100/60 dark:bg-cyan-500/10",
+  fighting: "bg-red-100/60 dark:bg-red-500/10", poison: "bg-purple-100/60 dark:bg-purple-500/10",
+  ground: "bg-amber-100/60 dark:bg-amber-500/10", flying: "bg-indigo-100/60 dark:bg-indigo-500/10",
+  psychic: "bg-pink-100/60 dark:bg-pink-500/10", bug: "bg-lime-100/60 dark:bg-lime-500/10",
+  rock: "bg-stone-100/70 dark:bg-stone-500/10", ghost: "bg-violet-100/60 dark:bg-violet-500/10",
+  dragon: "bg-indigo-100/60 dark:bg-indigo-500/10", dark: "bg-slate-100/70 dark:bg-slate-500/10",
+  steel: "bg-slate-100/70 dark:bg-slate-500/10", fairy: "bg-rose-100/60 dark:bg-rose-500/10",
+};
+
+function rememberBrowsePosition() {
+  try {
+    sessionStorage.setItem("pokedex:return-url", `${window.location.pathname}${window.location.search}`);
+    sessionStorage.setItem("pokedex:scroll-y", String(window.scrollY));
+  } catch { /* Browsing still works when storage is unavailable. */ }
 }
 
-export default function PokemonCard({ pokemon, spirit }: PokemonCardProps) {
-  const pokemonId = getPokemonId(pokemon.url);
-  const isPriority = parseInt(pokemonId) <= POKEMON_PER_PAGE;
-  let imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonId}.png`;
-
-  switch (spirit) {
-    case "Default":
-      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`;
-      break;
-
-    case "Shiny":
-      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemonId}.png`;
-      break;
-
-    case "Dream World":
-      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${pokemonId}.svg`;
-      break;
-
-    case "Home":
-      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemonId}.png`;
-      break;
-
-    case "Home Shiny":
-      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/${pokemonId}.png`;
-      break;
-
-    case "Official Artwork":
-      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonId}.png`;
-      break;
-
-    case "Official Artwork Shiny":
-      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/${pokemonId}.png`;
-      break;
-
-    case "Showdown":
-      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/${pokemonId}.gif`;
-      break;
-
-    case "Showdown Shiny":
-      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/${pokemonId}.gif`;
-      break;
-
-    case "Back":
-      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${pokemonId}.png`;
-      break;
-
-    case "Back Shiny":
-      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/${pokemonId}.png`;
-      break;
-
-    case "Showdown Back":
-      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/${pokemonId}.gif`;
-      break;
-
-    case "Showdown Back Shiny":
-      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/${pokemonId}.gif`;
-      break;
-
-    default:
-      imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonId}.png`;
-      break;
-  }
+export default function PokemonCard({ pokemon, artwork, shiny, priority = false }: PokemonCardProps) {
+  const [failedUrls, setFailedUrls] = useState<string[]>([]);
+  const candidates = [spriteUrl(pokemon.id, artwork, shiny), spriteUrl(pokemon.id, "Official Artwork", false), spriteUrl(pokemon.id, "Default", false)];
+  const imageUrl = candidates.find((url) => !failedUrls.includes(url));
+  const name = displayPokemonName(pokemon.name);
 
   return (
-    <Link href={`/pokemon/${pokemon.name}`} className="group">
-      <Card className="overflow-hidden transition-all duration-300 hover:shadow-primary/20 hover:shadow-2xl hover:-translate-y-1 hover:border-primary">
-        <CardContent className="p-0 flex flex-col items-center justify-center">
-          <div className="aspect-square w-full relative bg-gray-50">
-            <Image
-              src={imageUrl}
-              alt={pokemon.name}
-              fill
-              className="object-contain p-4 group-hover:p-2 transition-all duration-300"
-              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-              {...(isPriority ? { priority: true } : { loading: "lazy" })}
-              data-ai-hint="pokemon character"
-            />
+    <Link
+      href={`/pokemon/${pokemon.id}`}
+      prefetch={false}
+      onClick={rememberBrowsePosition}
+      className="group block overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition duration-200 hover:-translate-y-1 hover:border-foreground/25 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 motion-reduce:transform-none"
+    >
+      <div className={cn("relative aspect-square overflow-hidden", typeTints[pokemon.types[0]] || "bg-muted/50")}>
+        <span className="absolute left-3 top-3 z-10 font-mono text-[11px] font-medium tracking-wider text-foreground/60 sm:left-4 sm:top-4">#{String(pokemon.id).padStart(4, "0")}</span>
+        {shiny && <span className="absolute right-3 top-3 text-xs font-medium text-foreground/70" aria-label="Shiny variant">✦</span>}
+        {imageUrl ? (
+          <Image
+            key={imageUrl}
+            src={imageUrl}
+            alt=""
+            fill
+            priority={priority}
+            fetchPriority={priority ? "high" : undefined}
+            unoptimized={imageUrl.endsWith(".gif") || imageUrl.endsWith(".svg")}
+            sizes="(max-width: 767px) 46vw, (max-width: 1023px) 30vw, (max-width: 1279px) 22vw, 220px"
+            className="object-contain p-5 pt-8 transition-transform duration-300 group-hover:scale-105 motion-reduce:transform-none sm:p-7 sm:pt-10"
+            onError={() => setFailedUrls((previous) => previous.includes(imageUrl) ? previous : [...previous, imageUrl])}
+          />
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground">
+            <ImageOff className="h-8 w-8" aria-hidden="true" />
+            <span className="text-xs">Artwork unavailable</span>
           </div>
-          <div className="w-full p-2 bg-card-foreground/5 dark:bg-card-foreground/10 text-center">
-            <p className="capitalize font-semibold text-sm truncate">
-              {pokemon.name.replace("-", " ")}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+        )}
+      </div>
+      <div className="space-y-3 border-t border-border/60 px-3 py-4 sm:px-4">
+        <h2 className="truncate text-base font-semibold tracking-tight text-card-foreground sm:text-lg">{name}</h2>
+        <div className="flex min-h-6 flex-wrap gap-1.5">
+          {pokemon.types.length ? pokemon.types.map((type) => <TypeBadge key={type} typeName={type} className="px-2 py-0.5 text-[11px] font-medium" />) : <Skeleton className="h-6 w-16 rounded-full" aria-label="Loading Pokémon types" />}
+        </div>
+      </div>
     </Link>
   );
 }
 
 export function PokemonCardSkeleton() {
   return (
-    <div className="flex flex-col gap-2">
-      <Skeleton className="aspect-square w-full rounded-lg" />
-      <Skeleton className="h-6 w-3/4 mx-auto rounded-md" />
+    <div className="overflow-hidden rounded-2xl border border-border bg-card" aria-hidden="true">
+      <Skeleton className="aspect-square w-full rounded-none" />
+      <div className="space-y-3 border-t border-border/60 px-3 py-4 sm:px-4">
+        <Skeleton className="h-7 w-3/4" />
+        <div className="flex h-6 gap-2"><Skeleton className="h-6 w-14 rounded-full" /><Skeleton className="h-6 w-14 rounded-full" /></div>
+      </div>
     </div>
   );
 }
