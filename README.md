@@ -1,6 +1,6 @@
 # Pokédex Field Guide
 
-A responsive Pokémon field guide built with Next.js 15.3.3, React, TypeScript, Tailwind CSS, and [PokéAPI](https://pokeapi.co/).
+A responsive Pokémon field guide built with Next.js 16, React, TypeScript, Tailwind CSS, and [PokéAPI](https://pokeapi.co/).
 
 ## Features
 
@@ -16,7 +16,6 @@ There is no collection tracker or alternate-form selection UI.
 
 ## Setup
 
-<<<<<<< HEAD
 ## 🛠️ Tech Stack
 
 - [Next.js 16](https://nextjs.org/) (Active LTS)
@@ -28,9 +27,6 @@ There is no collection tracker or alternate-form selection UI.
 ---
 
 ## 📦 Installation
-=======
-Use **Node.js 20+** and npm.
->>>>>>> f502f61 (new verison)
 
 Requires Node.js 20.9 or newer.
 

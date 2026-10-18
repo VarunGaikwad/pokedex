@@ -10,53 +10,7 @@ import PokemonEvolutionChain from "@/components/pokemon-evolution-chain";
 import PokemonTypeEffectiveness from "@/components/pokemon-type-effectiveness";
 import BackToPokedex from "./back-to-pokedex";
 
-<<<<<<< HEAD
-function getGenderRatio(
-  rate: number
-): { male: number; female: number } | "genderless" {
-  if (rate === -1) {
-    return "genderless";
-  }
-  const femalePercentage = (rate / 8) * 100;
-  const malePercentage = 100 - femalePercentage;
-  return { male: malePercentage, female: femalePercentage };
-}
-
-export default async function PokemonDetailPage({
-  params,
-}: {
-  params: Promise<{ name: string }>;
-}) {
-  const { name } = await params;
-  const pokemon = await getPokemonDetails(name);
-
-  if (!pokemon) {
-    notFound();
-  }
-
-  const evolutionChain = await getEvolutionChain(
-    pokemon.species_details.evolution_chain?.url
-  );
-
-  const flavorTextEntry = pokemon.species_details.flavor_text_entries.find(
-    (entry: any) => entry.language.name === "en"
-  );
-
-  const category =
-    pokemon.species_details.genera?.find((g: any) => g.language.name === "en")
-      ?.genus || "Unknown";
-
-  const moves = pokemon.moves;
-  const abilities = pokemon.abilities.map(
-    (ability: any) => ability.ability.name
-  );
-  const types = pokemon.types.map((typeInfo: any) => typeInfo.type.name);
-
-  const genderRatio = getGenderRatio(pokemon.species_details.gender_rate);
-
-=======
 function SectionLoading({ title }: { title: string }) {
->>>>>>> f502f61 (new verison)
   return (
     <div className="field-panel" role="status">
       <h2 className="section-heading mb-3">{title}</h2>
