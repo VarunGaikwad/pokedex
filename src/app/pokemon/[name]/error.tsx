@@ -8,7 +8,7 @@ export default function PokemonDetailError({ reset }: { error: Error & { digest?
   return (
     <main id="main-content" tabIndex={-1} className="field-container py-7">
       <BackToPokedex />
-      <div className="field-panel mx-auto my-10 max-w-xl text-center">
+      <div className="dialog-panel mx-auto my-10 max-w-xl p-7 text-center sm:p-10">
         <RadioTower className="mx-auto mb-5 h-10 w-10 text-muted-foreground" aria-hidden="true" />
         <p className="eyebrow mb-3">A little interference</p>
         <h1 className="text-3xl font-bold tracking-tight">This field note couldn’t be loaded.</h1>

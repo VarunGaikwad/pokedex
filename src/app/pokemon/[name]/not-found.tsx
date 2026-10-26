@@ -5,7 +5,7 @@ export default function NotFound() {
   return (
     <main id="main-content" tabIndex={-1} className="field-container py-7">
       <BackToPokedex />
-      <div className="field-panel mx-auto my-10 max-w-xl text-center">
+      <div className="dialog-panel mx-auto my-10 max-w-xl p-7 text-center sm:p-10">
         <SearchX className="mx-auto mb-5 h-10 w-10 text-muted-foreground" aria-hidden="true" />
         <p className="eyebrow mb-3">An uncharted entry</p>
         <h1 className="text-3xl font-bold tracking-tight">Pokémon not found.</h1>

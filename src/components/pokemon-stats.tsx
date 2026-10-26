@@ -20,11 +20,11 @@ export default function PokemonStats({ stats }: PokemonStatsProps) {
       {stats.map(({ stat, base_stat }) => (
         <div key={stat.name} className="grid grid-cols-[5.5rem_2rem_minmax(0,1fr)] items-center gap-3 sm:grid-cols-[6rem_2rem_minmax(0,1fr)]">
           <span className="text-xs font-medium text-muted-foreground sm:text-sm">{labels[stat.name] || stat.name}</span>
-          <span className="text-right text-sm font-semibold tabular-nums">{base_stat}</span>
-          <Progress value={Math.min(100, base_stat / 255 * 100)} aria-label={labels[stat.name] || stat.name} aria-valuemin={0} aria-valuemax={255} aria-valuenow={base_stat} className="h-2 bg-muted" indicatorClassName={colors[stat.name] || "bg-primary"} />
+          <span className="text-right font-mono text-sm font-bold tabular-nums">{base_stat}</span>
+          <Progress value={Math.min(100, base_stat / 255 * 100)} aria-label={labels[stat.name] || stat.name} aria-valuemin={0} aria-valuemax={255} aria-valuenow={base_stat} className="h-3 rounded-sm border border-foreground/10 bg-foreground/10 p-0.5 [&>div]:rounded-[1px]" indicatorClassName={colors[stat.name] || "bg-primary"} />
         </div>
       ))}
-      <div className="flex items-center justify-between border-t pt-4 text-sm"><span className="font-medium text-muted-foreground">Total</span><span className="font-bold tabular-nums">{stats.reduce((sum, stat) => sum + stat.base_stat, 0)}</span></div>
+      <div className="flex items-center justify-between rounded-xl border bg-muted/40 px-4 py-3 text-sm"><span className="font-medium text-muted-foreground">Total</span><span className="font-mono text-xl font-bold tabular-nums">{stats.reduce((sum, stat) => sum + stat.base_stat, 0)}</span></div>
       <p className="text-xs leading-relaxed text-muted-foreground">Base values, before training. Each stat is shown on a scale of 255.</p>
     </div>
   );

@@ -4,69 +4,119 @@
 
 @layer base {
   :root {
-    --background: 44 43% 96%;
-    --foreground: 210 13% 14%;
-    --card: 45 50% 99%;
-    --card-foreground: 210 13% 14%;
-    --popover: 45 50% 99%;
-    --popover-foreground: 210 13% 14%;
-    --primary: 49 100% 55%;
-    --primary-foreground: 210 20% 10%;
-    --secondary: 42 24% 90%;
-    --secondary-foreground: 210 13% 20%;
-    --muted: 42 24% 91%;
-    --muted-foreground: 210 8% 40%;
-    --accent: 48 80% 88%;
-    --accent-foreground: 210 20% 12%;
+    --background: 75 30% 96%;
+    --foreground: 164 24% 13%;
+    --card: 48 40% 99%;
+    --card-foreground: 164 24% 13%;
+    --popover: 48 40% 99%;
+    --popover-foreground: 164 24% 13%;
+    --primary: 359 68% 47%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 78 24% 90%;
+    --secondary-foreground: 164 24% 18%;
+    --muted: 80 20% 91%;
+    --muted-foreground: 155 10% 36%;
+    --accent: 48 93% 85%;
+    --accent-foreground: 164 24% 13%;
     --destructive: 0 72% 40%;
     --destructive-foreground: 0 0% 100%;
-    --border: 40 20% 83%;
-    --input: 40 20% 78%;
-    --ring: 210 13% 25%;
+    --border: 105 16% 81%;
+    --input: 105 14% 72%;
+    --ring: 359 68% 47%;
     --radius: 1rem;
-    --chart-1: 49 95% 45%;
+    --chart-1: 359 68% 47%;
     --chart-2: 155 35% 40%;
     --chart-3: 25 65% 50%;
     --chart-4: 260 35% 55%;
     --chart-5: 340 45% 50%;
   }
-
   .dark {
-    --background: 210 13% 9%;
-    --foreground: 43 25% 93%;
-    --card: 210 12% 13%;
-    --card-foreground: 43 25% 93%;
-    --popover: 210 12% 13%;
-    --popover-foreground: 43 25% 93%;
-    --primary: 49 100% 58%;
-    --primary-foreground: 210 20% 10%;
-    --secondary: 210 10% 21%;
-    --secondary-foreground: 43 25% 93%;
-    --muted: 210 10% 19%;
-    --muted-foreground: 40 9% 68%;
-    --accent: 48 22% 23%;
-    --accent-foreground: 48 90% 80%;
+    --background: 185 30% 7%;
+    --foreground: 65 26% 94%;
+    --card: 180 23% 12%;
+    --card-foreground: 65 26% 94%;
+    --popover: 180 23% 12%;
+    --popover-foreground: 65 26% 94%;
+    --primary: 359 68% 47%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 176 19% 20%;
+    --secondary-foreground: 65 26% 94%;
+    --muted: 180 18% 18%;
+    --muted-foreground: 100 13% 72%;
+    --accent: 46 35% 22%;
+    --accent-foreground: 48 90% 84%;
     --destructive: 0 85% 72%;
-    --destructive-foreground: 210 20% 10%;
-    --border: 210 8% 26%;
-    --input: 210 8% 32%;
-    --ring: 49 100% 58%;
+    --destructive-foreground: 185 30% 7%;
+    --border: 170 16% 27%;
+    --input: 170 13% 37%;
+    --ring: 48 90% 67%;
   }
-
   * { @apply border-border; }
   html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
-  body { @apply bg-background text-foreground; }
-  ::selection { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
-  :focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 4px; }
+  body {
+    @apply bg-background text-foreground;
+    background-image: linear-gradient(hsl(var(--border) / .18) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border) / .18) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  ::selection { background: hsl(var(--primary)); color: white; }
+  :focus-visible { outline: 3px solid hsl(var(--ring)); outline-offset: 4px; }
   main { min-width: 0; }
   h1, h2, h3 { text-wrap: balance; }
+  button:not([role="radio"]):not([role="switch"]), [role="combobox"] { min-height: 44px; }
+  /* Expand hit areas without stretching the compact switch and radio visuals. */
+  button[role="switch"], button[role="radio"] { position: relative; }
+  button[role="switch"]::before { content: ''; position: absolute; inset: -10px 0; }
+  button[role="radio"]::before { content: ''; position: absolute; inset: -14px; }
 }
 
 @layer components {
   .field-container { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10; }
-  .eyebrow { @apply text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground; }
-  .field-panel { @apply min-w-0 rounded-2xl border bg-card p-5 sm:p-7; }
-  .section-heading { @apply text-xl font-bold tracking-tight sm:text-2xl; }
+  .device-label, .eyebrow { @apply font-mono text-[11px] font-bold uppercase tracking-[0.15em] text-muted-foreground; }
+  .device-panel, .field-panel, .dialog-panel {
+    @apply min-w-0 rounded-2xl border bg-card;
+    box-shadow: 4px 4px 0 hsl(var(--foreground) / .08);
+  }
+  .field-panel { @apply p-5 sm:p-7; }
+  .section-heading { @apply text-xl font-extrabold tracking-tight sm:text-2xl; }
+  .scenic-panel {
+    @apply relative isolate overflow-hidden rounded-3xl border border-emerald-950/30 text-white;
+    background-color: #234f38;
+    background-image: linear-gradient(90deg, rgb(9 39 32 / .96), rgb(9 39 32 / .83) 36%, rgb(9 39 32 / .18) 76%), url('/images/route-day.svg');
+    background-size: cover;
+    background-position: center;
+    box-shadow: 5px 5px 0 hsl(var(--foreground) / .12);
+  }
+  .dark .scenic-panel {
+    background-image: linear-gradient(90deg, rgb(6 24 29 / .97), rgb(6 24 29 / .85) 36%, rgb(6 24 29 / .12) 76%), url('/images/route-night.svg');
+  }
+  .battle-stage {
+    @apply relative isolate overflow-hidden rounded-[20px] border;
+    background: #669a64 url('/images/route-day.svg') center / cover;
+  }
+  .dark .battle-stage { background-image: url('/images/route-night.svg'); }
+  .battle-stage::before {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(180deg, rgb(13 47 32 / .12), rgb(13 47 32 / .4));
+  }
+  .battle-stage::after {
+    content: ''; position: absolute; z-index: -1; width: 76%; height: 25%; bottom: 9%; left: 12%;
+    border-radius: 50%; background: #a7c97b; border: 5px solid #62864e; box-shadow: 0 8px 0 #375e42;
+  }
+  .dark .battle-stage::after { background: #436754; border-color: #2c4c43; box-shadow: 0 8px 0 #152f30; }
+  .pokeball-mark {
+    @apply relative block shrink-0 overflow-hidden rounded-full border-[3px] border-foreground;
+    background: linear-gradient(#d93639 0 45%, #203b33 45% 55%, #fffdf5 55%);
+  }
+  .pokeball-mark::after {
+    content: ''; position: absolute; width: 32%; height: 32%; left: 34%; top: 34%;
+    border: 3px solid #203b33; border-radius: 50%; background: #fffdf5;
+  }
+  .pokemon-art::before {
+    content: ''; position: absolute; width: 69%; height: 69%; left: 15.5%; top: 20%;
+    border: 17px solid currentColor; border-radius: 50%; opacity: .055;
+    background: linear-gradient(transparent 44%, currentColor 44% 56%, transparent 56%);
+  }
+  .pokemon-art img { z-index: 1; }
   .skip-link { @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-3 focus:font-bold focus:text-primary-foreground; }
 }
 
@@ -77,13 +127,10 @@
     background-size: 40px 40px;
   }
 }
-
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important; scroll-behavior: auto !important;
   }
 }

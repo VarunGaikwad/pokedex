@@ -12,10 +12,10 @@ import BackToPokedex from "./back-to-pokedex";
 
 function SectionLoading({ title }: { title: string }) {
   return (
-    <div className="field-panel" role="status">
+    <div className="dialog-panel p-6 sm:p-7" role="status">
       <h2 className="section-heading mb-3">{title}</h2>
       <p className="text-sm text-muted-foreground">Gathering field notes…</p>
-      <div className="mt-5 h-2 w-2/3 animate-pulse rounded-full bg-muted" />
+      <div className="mt-5 h-2 w-2/3 animate-pulse rounded-full bg-muted motion-reduce:animate-none" />
     </div>
   );
 }
@@ -41,33 +41,32 @@ export default async function PokemonDetailPage({ params }: { params: Promise<{ 
   return (
     <main id="main-content" tabIndex={-1} className="field-container pb-16 pt-5 sm:pt-7">
       <BackToPokedex />
-      <header className="mb-6 flex flex-wrap items-end justify-between gap-5">
-        <div className="min-w-0">
-          <p className="eyebrow mb-2">Field notes <span className="ml-2 font-mono tracking-normal">#{String(pokemon.id).padStart(4, "0")}</span></p>
-          <h1 className="break-words text-4xl font-extrabold capitalize leading-tight tracking-[-0.045em] sm:text-6xl">{pokemon.name.replaceAll("-", " ")}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">{category}</p>
-        </div>
-        <div className="flex flex-wrap gap-2" aria-label="Pokémon types">
-          {types.map(type => <TypeBadge key={type} typeName={type} />)}
-        </div>
-      </header>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card px-4 py-3">
+        <p className="device-label">National Pokédex <span className="ml-2 text-foreground">#{String(pokemon.id).padStart(4, "0")}</span></p>
+        <span className="device-label flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-cyan-500 ring-4 ring-cyan-500/10" aria-hidden="true" />Entry received</span>
+      </div>
 
-      <nav aria-label="Entry sections" className="mb-7 flex gap-1 border-b sm:gap-6">
+      <nav aria-label="Entry sections" className="mb-7 grid grid-cols-4 gap-1 border-b sm:flex sm:gap-6">
         {[["overview", "Overview"], ["stats", "Stats"], ["evolution", "Evolution"], ["moves", "Moves"]].map(([id, label], index) => (
-          <a key={id} href={`#${id}`} className={`min-h-11 border-b-2 px-3 py-3 text-sm font-semibold transition-colors hover:border-foreground hover:text-foreground sm:px-1 ${index === 0 ? "border-foreground text-foreground" : "border-transparent text-muted-foreground"}`}>{label}</a>
+          <a key={id} href={`#${id}`} className={`min-h-11 border-b-2 px-1 py-3 text-xs font-semibold sm:px-1 sm:text-sm transition-colors hover:border-foreground hover:text-foreground ${index === 0 ? "border-foreground text-foreground" : "border-transparent text-muted-foreground"}`}>{label}</a>
         ))}
       </nav>
 
       <section id="overview" aria-label="Overview" className="grid min-w-0 gap-6 lg:grid-cols-[1fr_1.1fr] lg:gap-10">
         <PokemonSprites name={pokemon.name} sprites={pokemon.sprites} genderRate={genderRate} />
-        <div className="min-w-0 space-y-6 lg:py-4">
-          <div>
-            <p className="eyebrow mb-3">Meet {pokemon.name.replaceAll("-", " ")}</p>
+        <div className="min-w-0 space-y-6 lg:py-2">
+          <header>
+            <p className="device-label mb-3">Pokémon / {category}</p>
+            <h1 className="break-words text-4xl font-extrabold capitalize leading-tight tracking-[-0.045em] sm:text-6xl">{pokemon.name.replaceAll("-", " ")}</h1>
+            <div className="mt-4 flex flex-wrap gap-2" aria-label="Pokémon types">{types.map(type => <TypeBadge key={type} typeName={type} />)}</div>
+          </header>
+          <div className="border-l-4 border-primary pl-5">
+            <p className="device-label mb-3">Professor’s field notes</p>
             <p className="text-lg leading-relaxed sm:text-xl sm:leading-relaxed">{description ? description.replace(/[\n\f\r]+/g, " ").replace(/\\n/g, " ") : "There's still more to discover about this Pokémon. Explore its stats, abilities, and evolution below."}</p>
           </div>
-          <div className="field-panel">
-            <h2 className="section-heading mb-5">At a glance</h2>
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-6">
+          <div className="device-panel p-5 sm:p-6">
+            <h2 className="device-label mb-5">Biological data</h2>
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-6 [&>div]:min-w-0 [&>div]:border-t [&>div]:pt-3">
               <div><dt className="eyebrow mb-1.5">Height</dt><dd className="text-xl font-semibold tabular-nums">{(pokemon.height / 10).toFixed(1)} <span className="text-sm font-normal text-muted-foreground">m</span></dd></div>
               <div><dt className="eyebrow mb-1.5">Weight</dt><dd className="text-xl font-semibold tabular-nums">{(pokemon.weight / 10).toFixed(1)} <span className="text-sm font-normal text-muted-foreground">kg</span></dd></div>
               <div><dt className="eyebrow mb-1.5">Abilities</dt><dd className="space-y-1 text-sm font-medium capitalize">{pokemon.abilities.map((entry: any) => <div key={entry.ability.name}>{entry.ability.name.replaceAll("-", " ")}{entry.is_hidden && <span className="mt-0.5 block text-xs font-normal normal-case text-muted-foreground">Hidden ability</span>}</div>)}</dd></div>
@@ -78,8 +77,8 @@ export default async function PokemonDetailPage({ params }: { params: Promise<{ 
       </section>
 
       <div className="mt-8 grid min-w-0 items-start gap-6 lg:grid-cols-2">
-        <section id="stats" className="field-panel" aria-labelledby="stats-title">
-          <p className="eyebrow mb-2">The numbers behind the nature</p>
+        <section id="stats" className="device-panel p-5 sm:p-7" aria-labelledby="stats-title">
+          <p className="eyebrow mb-2">01 / Battle potential</p>
           <h2 id="stats-title" className="section-heading mb-6">Base stats</h2>
           <PokemonStats stats={pokemon.stats} />
         </section>
@@ -97,7 +96,7 @@ export default async function PokemonDetailPage({ params }: { params: Promise<{ 
           <PokemonMoves pokemonName={pokemon.name} moves={pokemon.moves} />
         </Suspense>
       </section>
-      <footer className="mt-10 border-t pt-5 text-xs text-muted-foreground">Every Pokémon has a story. Keep exploring.</footer>
+      <footer className="mt-10 border-t pt-5 text-xs text-muted-foreground">End of entry / Every Pokémon has a story. Keep exploring.</footer>
     </main>
   );
 }

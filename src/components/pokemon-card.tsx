@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ImageOff } from "lucide-react";
+import { ArrowUpRight, ImageOff } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import TypeBadge from "@/components/type-badge";
 import type { PokemonSummary } from "@/lib/pokeapi";
@@ -47,22 +47,22 @@ export default function PokemonCard({ pokemon, artwork, shiny, priority = false 
       href={`/pokemon/${pokemon.id}`}
       prefetch={false}
       onClick={rememberBrowsePosition}
-      className="group block overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition duration-200 hover:-translate-y-1 hover:border-foreground/25 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 motion-reduce:transform-none"
+      className="device-panel group block overflow-hidden transition duration-200 hover:-translate-y-1 hover:border-foreground/40 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 motion-reduce:transform-none"
     >
-      <div className={cn("relative aspect-square overflow-hidden", typeTints[pokemon.types[0]] || "bg-muted/50")}>
-        <span className="absolute left-3 top-3 z-10 font-mono text-[11px] font-medium tracking-wider text-foreground/60 sm:left-4 sm:top-4">#{String(pokemon.id).padStart(4, "0")}</span>
-        {shiny && <span className="absolute right-3 top-3 text-xs font-medium text-foreground/70" aria-label="Shiny variant">✦</span>}
+      <div className={cn("pokemon-art relative aspect-[1.1] overflow-hidden", typeTints[pokemon.types[0]] || "bg-muted/50")}>
+        <span className="absolute left-3 top-3 z-10 rounded-md border border-foreground/10 bg-card/90 px-2 py-1 font-mono text-[10px] font-bold tracking-wider text-foreground sm:left-4 sm:top-4">#{String(pokemon.id).padStart(4, "0")}</span>
+        {shiny && <span className="absolute right-3 top-3 z-10 text-xs font-medium text-foreground/70" aria-label="Shiny variant">✦</span>}
         {imageUrl ? (
           <Image
             key={imageUrl}
             src={imageUrl}
-            alt=""
+            alt={`${shiny ? "Shiny " : ""}${name}`}
             fill
             priority={priority}
             fetchPriority={priority ? "high" : undefined}
             unoptimized={imageUrl.endsWith(".gif") || imageUrl.endsWith(".svg")}
-            sizes="(max-width: 767px) 46vw, (max-width: 1023px) 30vw, (max-width: 1279px) 22vw, 220px"
-            className="object-contain p-5 pt-8 transition-transform duration-300 group-hover:scale-105 motion-reduce:transform-none sm:p-7 sm:pt-10"
+            sizes="(max-width: 767px) 46vw, (max-width: 1023px) 30vw, 280px"
+            className="object-contain p-3 pt-9 transition-transform duration-300 group-hover:scale-105 motion-reduce:transform-none sm:p-5 sm:pt-10"
             onError={() => setFailedUrls((previous) => previous.includes(imageUrl) ? previous : [...previous, imageUrl])}
           />
         ) : (
@@ -73,7 +73,7 @@ export default function PokemonCard({ pokemon, artwork, shiny, priority = false 
         )}
       </div>
       <div className="space-y-3 border-t border-border/60 px-3 py-4 sm:px-4">
-        <h2 className="truncate text-base font-semibold tracking-tight text-card-foreground sm:text-lg">{name}</h2>
+        <div className="flex items-center justify-between gap-2"><h2 className="truncate text-base font-extrabold tracking-tight text-card-foreground sm:text-xl">{name}</h2><ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary" aria-hidden="true" /></div>
         <div className="flex min-h-6 flex-wrap gap-1.5">
           {pokemon.types.length ? pokemon.types.map((type) => <TypeBadge key={type} typeName={type} className="px-2 py-0.5 text-[11px] font-medium" />) : <Skeleton className="h-6 w-16 rounded-full" aria-label="Loading Pokémon types" />}
         </div>
@@ -84,8 +84,8 @@ export default function PokemonCard({ pokemon, artwork, shiny, priority = false 
 
 export function PokemonCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-card" aria-hidden="true">
-      <Skeleton className="aspect-square w-full rounded-none" />
+    <div className="device-panel overflow-hidden" aria-hidden="true">
+      <Skeleton className="aspect-[1.1] w-full rounded-none" />
       <div className="space-y-3 border-t border-border/60 px-3 py-4 sm:px-4">
         <Skeleton className="h-7 w-3/4" />
         <div className="flex h-6 gap-2"><Skeleton className="h-6 w-14 rounded-full" /><Skeleton className="h-6 w-14 rounded-full" /></div>

@@ -15,7 +15,7 @@ export default function BackToPokedex() {
     } catch { /* Direct entry or unavailable storage returns to the full guide. */ }
   }, []);
   return (
-    <Link href={href} className="mb-7 inline-flex min-h-11 items-center gap-2 rounded-md text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+    <Link href={href} className="mb-5 inline-flex min-h-11 items-center gap-2 rounded-xl border bg-card px-4 font-mono text-xs font-semibold text-muted-foreground transition-colors hover:border-primary hover:text-foreground">
       <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back to Pokédex
     </Link>
   );

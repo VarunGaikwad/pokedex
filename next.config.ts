@@ -1,6 +1,7 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ['port9002-workspaces-ws-s8jui.us10.trial.applicationstudio.cloud.sap'],
   images: {
     remotePatterns: [
       {

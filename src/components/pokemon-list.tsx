@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 export { POKEMON_PER_PAGE };
-const gridClass = "grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5";
+const gridClass = "grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4";
 interface Membership {
   key: string;
   typeIds?: ReadonlySet<number>;
@@ -175,14 +175,19 @@ export default function PokemonList({ initial }: { initial?: InitialDiscovery })
   };
 
   return (
-    <section className="space-y-6" aria-label="Pokémon field guide">
-      <div className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
+    <section id="pokedex-explorer" className="scroll-mt-6 space-y-6" aria-label="Pokémon field guide">
+      <div className="device-panel overflow-hidden">
+        <div className="flex items-center justify-between gap-3 border-b bg-muted/50 px-4 py-4 sm:px-6">
+          <div><p className="device-label mb-1">Discovery console</p><h2 className="section-heading">Who&apos;s that Pokémon?</h2></div>
+          <span className="hidden items-center gap-2 rounded-full border bg-card px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground sm:inline-flex"><span className="h-2 w-2 rounded-full bg-cyan-500" aria-hidden="true" />Ready to explore</span>
+        </div>
+        <div className="p-4 sm:p-6">
         <div className="flex items-end gap-3">
           <div className="min-w-0 flex-1 space-y-1.5">
             <label htmlFor="pokemon-search" className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Find your Pokémon</label>
             <div className="relative">
               <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-              <Input id="pokemon-search" type="search" placeholder="Name or number, e.g. Pikachu or #0025" value={state.q} maxLength={100} onChange={(event) => update({ q: event.target.value, page: 1 }, true)} className="h-11 bg-background pl-10 text-sm" />
+              <Input id="pokemon-search" type="search" placeholder="Name or Pokédex number…" value={state.q} maxLength={100} onChange={(event) => update({ q: event.target.value, page: 1 }, true)} className="h-11 bg-background pl-10 text-sm" />
             </div>
           </div>
           <Sheet>
@@ -197,8 +202,9 @@ export default function PokemonList({ initial }: { initial?: InitialDiscovery })
         </div>
         <div className="mt-4 hidden grid-cols-3 gap-4 md:grid">{filterControls}</div>
         <div className="mt-4 hidden items-end justify-between gap-6 border-t border-border pt-4 md:flex">
-          <p className="max-w-sm text-xs leading-relaxed text-muted-foreground">A national-dex field guide. One entry per species, ready to discover by name or number.</p>
+          <p className="max-w-sm text-xs leading-relaxed text-muted-foreground">Your field guide, your view. Browse original artwork or switch to classic sprites.</p>
           <ArtworkControls artwork={state.artwork} shiny={state.shiny} onArtworkChange={(artwork) => update({ artwork })} onShinyChange={(shiny) => update({ shiny })} />
+        </div>
         </div>
       </div>
 
@@ -207,12 +213,12 @@ export default function PokemonList({ initial }: { initial?: InitialDiscovery })
           <p className="text-sm text-muted-foreground" role="status" aria-live="polite">
             {filtersReady ? <><strong className="font-semibold tabular-nums text-foreground">{filtered.length.toLocaleString()}</strong> Pokémon{filtered.length > 0 && <span className="ml-2 text-xs">· {page.start + 1}–{Math.min(page.start + POKEMON_PER_PAGE, filtered.length)} of {filtered.length.toLocaleString()}</span>}</> : "Opening the field guide…"}
           </p>
-          {activeFilters.length > 0 && <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 gap-1.5 text-xs"><RotateCcw className="h-3 w-3" aria-hidden="true" />Clear filters</Button>}
+          {activeFilters.length > 0 && <Button variant="ghost" size="sm" onClick={clearFilters} className="h-11 gap-1.5 text-xs"><RotateCcw className="h-3 w-3" aria-hidden="true" />Clear filters</Button>}
         </div>
-        {activeFilters.length > 0 && <div className="flex flex-wrap gap-2" aria-label="Active filters">{activeFilters.map((filter) => <button key={filter.label} onClick={filter.clear} aria-label={`Remove filter ${filter.label}`} className="inline-flex max-w-full items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><span className="truncate">{filter.label}</span><X className="h-3 w-3 shrink-0" aria-hidden="true" /></button>)}</div>}
+        {activeFilters.length > 0 && <div className="flex flex-wrap gap-2" aria-label="Active filters">{activeFilters.map((filter) => <button key={filter.label} onClick={filter.clear} aria-label={`Remove filter ${filter.label}`} className="inline-flex min-h-11 max-w-full items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><span className="truncate">{filter.label}</span><X className="h-3 w-3 shrink-0" aria-hidden="true" /></button>)}</div>}
 
         {error ? (
-          <div className="rounded-2xl border border-border bg-card px-6 py-16 text-center" role="alert">
+          <div className="dialog-panel px-6 py-16 text-center" role="alert">
             <BookOpen className="mx-auto mb-4 h-8 w-8 text-muted-foreground" aria-hidden="true" />
             <h2 className="text-xl font-semibold">A little trouble in the field</h2><p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">{error}</p>
             <Button className="mt-6 gap-2" onClick={() => {
@@ -224,7 +230,7 @@ export default function PokemonList({ initial }: { initial?: InitialDiscovery })
         ) : loading ? (
           <div className={gridClass} aria-label="Loading Pokémon" aria-busy="true">{Array.from({ length: filtersReady ? page.items.length : POKEMON_PER_PAGE }, (_, index) => <PokemonCardSkeleton key={index} />)}</div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border px-6 py-20 text-center">
+          <div className="dialog-panel border-dashed px-6 py-20 text-center">
             <Search className="mx-auto mb-4 h-8 w-8 text-muted-foreground" aria-hidden="true" /><h2 className="text-xl font-semibold">No discoveries just yet</h2><p className="mt-2 text-sm text-muted-foreground">Try another name or number, or give your filters a little more room.</p><Button onClick={clearFilters} className="mt-6">Clear filters</Button>
           </div>
         ) : (
@@ -232,9 +238,9 @@ export default function PokemonList({ initial }: { initial?: InitialDiscovery })
         )}
 
         {filtersReady && !error && filtered.length > 0 && <nav className="flex items-center justify-between gap-3 border-t border-border pt-6" aria-label="Pokémon pages">
-          <Button variant="outline" onClick={() => changePage(page.page - 1)} disabled={page.page === 1} className="gap-2"><ArrowLeft className="h-4 w-4" aria-hidden="true" /><span>Previous</span></Button>
+          <Button variant="outline" onClick={() => changePage(page.page - 1)} disabled={page.page === 1} className="h-11 gap-2"><ArrowLeft className="h-4 w-4" aria-hidden="true" /><span>Previous</span></Button>
           <span className="text-xs tabular-nums text-muted-foreground sm:text-sm">Page <strong className="font-medium text-foreground">{page.page}</strong> of {page.totalPages}</span>
-          <Button variant="outline" onClick={() => changePage(page.page + 1)} disabled={page.page === page.totalPages} className="gap-2"><span>Next</span><ArrowRight className="h-4 w-4" aria-hidden="true" /></Button>
+          <Button variant="outline" onClick={() => changePage(page.page + 1)} disabled={page.page === page.totalPages} className="h-11 gap-2"><span>Next</span><ArrowRight className="h-4 w-4" aria-hidden="true" /></Button>
         </nav>}
       </div>
     </section>
@@ -242,5 +248,5 @@ export default function PokemonList({ initial }: { initial?: InitialDiscovery })
 }
 
 function FilterSelect({ label, value, onChange, children }: { label: string; value: string; onChange: (value: string) => void; children: React.ReactNode }) {
-  return <div className="space-y-1.5"><span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{label}</span><Select value={value} onValueChange={onChange}><SelectTrigger aria-label={label} className="bg-background"><SelectValue /></SelectTrigger><SelectContent>{children}</SelectContent></Select></div>;
+  return <div className="space-y-1.5"><span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{label}</span><Select value={value} onValueChange={onChange}><SelectTrigger aria-label={label} className="h-11 bg-background"><SelectValue /></SelectTrigger><SelectContent>{children}</SelectContent></Select></div>;
 }

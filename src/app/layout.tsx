@@ -50,6 +50,12 @@ export default function RootLayout({
         <div className="min-h-screen">
           <SiteHeader />
           {children}
+          <footer className="border-t bg-card/70">
+            <div className="field-container flex flex-wrap items-center justify-between gap-3 py-6 text-xs leading-relaxed text-muted-foreground">
+              <span className="flex items-center gap-2 font-semibold"><span className="pokeball-mark h-5 w-5 border-2" aria-hidden="true" />Made for the joy of discovery.</span>
+              <span>Pokémon data & artwork via PokéAPI. Unofficial fan project.</span>
+            </div>
+          </footer>
         </div>
         <Toaster />
       </body>
